@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多模态骨骼动画标注平台</title>
+  <script src="https://static.mastergo.com/static/ai/resource/html/tailwind/tailwind.js"></script>
+  <link href="https://static.mastergo.com/static/ai/resource/html/googleapis/css2" rel="stylesheet">
+  <link href="https://static.mastergo.com/static/ai/resource/html/font-awesome/css/all.min.css" rel="stylesheet">
+  <script src="https://static.mastergo.com/static/ai/resource/html/echarts/5.5.0/echarts.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#10b981',
+            dark: '#1e293b',
+            'dark-2': '#334155',
+            'dark-3': '#475569',
+            highlight: '#60a5fa'
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '2px',
+            DEFAULT: '4px',
+            'md': '8px',
+            'lg': '12px',
+            'xl': '16px',
+            '2xl': '20px',
+            '3xl': '24px',
+            'full': '9999px',
+            'button': '4px'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 1024px;
+      background-color: #0f172a;
+      color: #e2e8f0;
+    }
+    .window-handle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      cursor: se-resize;
+      background-color: rgba(255,255,255,0.1);
+    }
+    .window-handle:hover {
+      background-color: rgba(255,255,255,0.3);
+    }
+    .segment-track {
+      height: 20px;
+      background-color: rgba(255,255,255,0.05);
+      position: relative;
+    }
+    .segment-block {
+      position: absolute;
+      height: 100%;
+      background-color: rgba(16, 185, 129, 0.3);
+      border-left: 2px solid #10b981;
+      border-right: 2px solid #ef4444;
+    }
+    .segment-start {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background-color: #10b981;
+      top: 6px;
+      transform: translateX(-50%);
+    }
+    .segment-end {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background-color: #ef4444;
+      top: 6px;
+      transform: translateX(-50%);
+    }
+    .time-shadow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(96, 165, 250, 0.1);
+      pointer-events: none;
+    }
+    .tool-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .tool-icon:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    .tool-icon.active {
+      background-color: rgba(59, 130, 246, 0.5);
+    }
+    .window {
+      border: 1px solid rgba(255,255,255,0.1);
+      background-color: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .window-header {
+      padding: 8px 12px;
+      background-color: #334155;
+      cursor: move;
+      user-select: none;
+    }
+    .window-content {
+      position: relative;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+  <!-- 顶部全局状态栏 -->
+  <header class="flex items-center justify-between px-4 py-2 bg-dark border-b border-dark-2 h-[5vh]">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-file-alt text-sm text-blue-400"></i>
+        <span class="text-sm">File: task_001_walk.bvh</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-clock text-sm text-blue-400"></i>
+        <span class="text-sm">Duration: 04:12</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-video text-sm text-blue-400"></i>
+        <i class="fas fa-project-diagram text-sm text-blue-400"></i>
+        <span class="text-sm">Type: B (Video+BVH)</span>
+      </div>
+    </div>
+    
+    <div class="text-lg font-medium">
+      <span class="cursor-pointer hover:text-blue-400">Frame 124</span>
+      <span>/ 3600</span>
+    </div>
+    
+    <div class="flex items-center space-x-4">
+      <button class="flex items-center space-x-1 px-3 py-1 bg-dark-2 hover:bg-dark-3 rounded-button whitespace-nowrap">
+        <i class="fas fa-forward text-sm"></i>
+        <span class="text-sm">跳过此文件</span>
+      </button>
+      <button class="flex items-center space-x-1 px-3 py-1 bg-dark-2 hover:bg-dark-3 rounded-button whitespace-nowrap">
+        <i class="fas fa-keyboard text-sm"></i>
+        <span class="text-sm">快捷键了解</span>
+      </button>
+    </div>
+  </header>
+  <!-- 中部核心工作区 -->
+  <main class="flex flex-1 overflow-hidden" style="height: 65vh;">
+    <!-- 左侧3D可视化区域 -->
+    <div class="flex-1 relative bg-dark-2">
+      <div class="absolute top-2 right-2 z-10 flex space-x-2">
+        <button class="px-2 py-1 bg-dark-3 hover:bg-dark rounded-button whitespace-nowrap text-xs">
+          <i class="fas fa-robot mr-1"></i>
+          <span>机器人叠加层</span>
+        </button>
+        <button class="px-2 py-1 bg-dark-3 hover:bg-dark rounded-button whitespace-nowrap text-xs">
+          <i class="fas fa-video mr-1"></i>
+          <span>视频背景</span>
+        </button>
+      </div>
+      
+      <!-- 3D视图容器 -->
+      <div class="w-full h-full flex items-center justify-center">
+        <div class="relative w-full h-full">
+          <!-- 这里应该是3D渲染区域 -->
+          <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-dark-2 to-dark-3">
+            <i class="fas fa-project-diagram text-6xl text-blue-400 opacity-30"></i>
+          </div>
+          
+          <!-- 视频窗口示例 -->
+          <div class="window absolute bottom-4 right-4" style="width: 300px; height: 200px;">
+            <div class="window-header flex justify-between items-center">
+              <span class="text-sm">第三方视角视频</span>
+              <div class="flex space-x-2">
+                <i class="fas fa-times cursor-pointer hover:text-red-400 text-xs"></i>
+              </div>
+            </div>
+            <div class="window-content w-full h-full">
+              <div class="w-full h-full bg-gradient-to-br from-dark-3 to-dark flex items-center justify-center">
+                <i class="fas fa-video text-4xl text-blue-400 opacity-30"></i>
+              </div>
+              <div class="window-handle"></div>
+            </div>
+          </div>
+          
+          <!-- 时间阴影示例 -->
+          <div class="time-shadow" style="left: 30%; width: 20%;"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 右侧工具栏 -->
+    <div class="w-[30%] bg-dark border-l border-dark-2 flex flex-col">
+      <div class="flex justify-between items-center px-3 py-2 border-b border-dark-2">
+        <h3 class="text-sm font-medium">标注工具</h3>
+        <button class="text-gray-400 hover:text-white">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <div class="p-2 grid grid-cols-4 gap-2 border-b border-dark-2">
+        <div class="tool-icon active" title="选择工具">
+          <i class="fas fa-mouse-pointer"></i>
+        </div>
+        <div class="tool-icon" title="分割切片" id="splitTool">
+          <i class="fas fa-cut"></i>
+        </div>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto">
+        <div class="px-3 py-2 border-b border-dark-2">
+          <h3 class="text-sm font-medium">切片列表</h3>
+        </div>
+        <div class="divide-y divide-dark-2">
+          <div class="px-3 py-2 hover:bg-dark-3 cursor-pointer">
+            <div class="flex justify-between items-center">
+              <span class="text-sm slice-name" data-id="1">#1 行走循环</span>
+              <span class="text-xs text-gray-400">00:00-00:12</span>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Level 1: 移动 | Level 2: 行走</div>
+          </div>
+          <div class="px-3 py-2 hover:bg-dark-3 cursor-pointer">
+            <div class="flex justify-between items-center">
+              <span class="text-sm slice-name" data-id="2">#2 转身动作</span>
+              <span class="text-xs text-gray-400">00:12-00:18</span>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Level 1: 移动 | Level 2: 转身</div>
+          </div>
+          <div class="px-3 py-2 hover:bg-dark-3 cursor-pointer">
+            <div class="flex justify-between items-center">
+              <span class="text-sm slice-name" data-id="3">#3 拾取物品</span>
+              <span class="text-xs text-gray-400">00:18-00:25</span>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Level 1: 操作 | Level 2: 拾取</div>
+          </div>
+          <div class="px-3 py-2 hover:bg-dark-3 cursor-pointer">
+            <div class="flex justify-between items-center">
+              <span class="text-sm slice-name" data-id="4">#4 站立等待</span>
+              <span class="text-xs text-gray-400">00:25-00:32</span>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Level 1: 静止 | Level 2: 站立</div>
+          </div>
+          <div class="px-3 py-2 hover:bg-dark-3 cursor-pointer">
+            <div class="flex justify-between items-center">
+              <span class="text-sm slice-name" data-id="5">#5 行走循环</span>
+              <span class="text-xs text-gray-400">00:32-00:44</span>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Level 1: 移动 | Level 2: 行走</div>
+          </div>
+          <div class="px-3 py-2 hover:bg-dark-3 cursor-pointer">
+            <div class="flex justify-between items-center">
+              <span class="text-sm slice-name" data-id="6">#6 挥手动作</span>
+              <span class="text-xs text-gray-400">00:44-00:48</span>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Level 1: 交互 | Level 2: 挥手</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 弹窗背景遮罩 (默认隐藏) -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="modalOverlay"></div>
+    
+    <!-- 标注弹窗 (默认隐藏) -->
+    <div class="fixed inset-0 flex items-center justify-center z-50 hidden" id="annotationModal">
+      <div class="bg-dark border border-dark-2 shadow-lg rounded-md w-80 max-w-[90%] max-h-[90%] overflow-y-auto">
+        <div class="p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-medium">新建时间切片</h3>
+            <button class="text-gray-400 hover:text-white" id="closeModal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs text-gray-400">开始时间</span>
+              <div class="flex items-center">
+                <input type="text" class="w-16 bg-dark-2 border border-dark-3 px-2 py-1 text-sm rounded" value="00:12">
+                <span class="text-xs text-gray-400 ml-1">(Frame 360)</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-gray-400">结束时间</span>
+              <div class="flex items-center">
+                <input type="text" class="w-16 bg-dark-2 border border-dark-3 px-2 py-1 text-sm rounded" value="00:18">
+                <span class="text-xs text-gray-400 ml-1">(Frame 540)</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-1">一级动作分类</label>
+          <input type="text" class="w-full bg-dark-2 border border-dark-3 px-2 py-1 text-sm rounded" placeholder="输入一级动作分类">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-1">二级动作分类</label>
+          <input type="text" class="w-full bg-dark-2 border border-dark-3 px-2 py-1 text-sm rounded" placeholder="输入二级动作分类">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-1">原始脚本选项</label>
+          <div class="relative">
+            <input type="text" class="w-full bg-dark-2 border border-dark-3 px-2 py-1 text-sm rounded" placeholder="搜索或选择原始脚本" id="scriptSearch">
+            <i class="fas fa-chevron-down absolute right-2 top-2 text-xs"></i>
+            <div class="absolute top-full left-0 right-0 bg-dark-2 border border-dark-3 rounded mt-1 max-h-40 overflow-y-auto hidden" id="scriptOptions">
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">行走循环</div>
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">转身动作</div>
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">拾取物品</div>
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">站立等待</div>
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">挥手动作</div>
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">跑步动作</div>
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">跳跃动作</div>
+              <div class="p-2 hover:bg-dark-3 cursor-pointer">蹲下动作</div>
+            </div>
+          </div>
+        </div>
+          
+          <div class="mb-4">
+            <label class="block text-xs text-gray-400 mb-1">脚本内容</label>
+            <div class="bg-dark-2 border border-dark-3 p-2 text-xs rounded h-24 overflow-y-auto">
+              <p class="mb-1">00:12 - 00:18: 角色从当前位置转身90度面向右侧的桌子，准备拾取桌上的杯子。</p>
+              <p class="text-blue-400">00:15 - 00:17: 右手抬起，准备抓取动作。</p>
+            </div>
+          </div>
+          
+          <div class="flex space-x-2">
+            <button class="flex-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 rounded-button whitespace-nowrap text-sm">
+              确认添加 (Enter)
+            </button>
+            <button class="flex-1 px-3 py-2 bg-dark-3 hover:bg-dark rounded-button whitespace-nowrap text-sm" id="cancelModal">
+              取消 (Esc)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 底部时间轴与控制区 -->
+  <footer class="bg-dark border-t border-dark-2" style="height: 20vh;">
+    <div class="h-full flex flex-col">
+      <!-- 缩略图轨道 -->
+      <div class="h-8 bg-dark-2 px-2 flex items-center">
+        <div class="w-full h-4 bg-dark-3 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-blue-500 to-black-500 w-full"></div>
+        </div>
+      </div>
+      
+      <!-- 切片轨道 -->
+      <div class="flex-1 relative">
+        <div class="segment-track">
+          <div class="segment-block" style="left: 0%; width: 10%;">
+            <div class="segment-start" style="left: 0%;"></div>
+            <div class="segment-end" style="left: 100%;"></div>
+          </div>
+          <div class="segment-block" style="left: 20%; width: 8%;">
+            <div class="segment-start" style="left: 0%;"></div>
+            <div class="segment-end" style="left: 100%;"></div>
+          </div>
+          <div class="segment-block" style="left: 30%; width: 10%;">
+            <div class="segment-start" style="left: 0%;"></div>
+            <div class="segment-end" style="left: 100%;"></div>
+          </div>
+          <div class="segment-block" style="left: 50%; width: 8%;">
+            <div class="segment-start" style="left: 0%;"></div>
+            <div class="segment-end" style="left: 100%;"></div>
+          </div>
+          <div class="segment-block" style="left: 60%; width: 12%;">
+            <div class="segment-start" style="left: 0%;"></div>
+            <div class="segment-end" style="left: 100%;"></div>
+          </div>
+          <div class="segment-block" style="left: 80%; width: 8%;">
+            <div class="segment-start" style="left: 0%;"></div>
+            <div class="segment-end" style="left: 100%;"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 播放控制条 -->
+      <div class="h-12 bg-dark-3 flex items-center justify-center px-4">
+        <div class="flex items-center space-x-4">
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-dark-2 hover:bg-dark">
+            <i class="fas fa-step-backward"></i>
+          </button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-dark-2 hover:bg-dark">
+            <i class="fas fa-backward"></i>
+          </button>
+          <button class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600">
+            <i class="fas fa-play"></i>
+          </button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-dark-2 hover:bg-dark">
+            <i class="fas fa-forward"></i>
+          </button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-full bg-dark-2 hover:bg-dark">
+            <i class="fas fa-step-forward"></i>
+          </button>
+          
+          <div class="flex items-center space-x-2 ml-4">
+            <span class="text-xs">速度:</span>
+            <div class="relative">
+              <select class="bg-dark-2 border border-dark-3 px-2 py-1 text-xs rounded">
+                <option>0.5x</option>
+                <option selected>1x</option>
+                <option>2x</option>
+                <option>4x</option>
+              </select>
+              <i class="fas fa-chevron-down absolute right-1 top-1 text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="flex-1 mx-4">
+            <div class="h-1 bg-dark-2 rounded-full overflow-hidden">
+              <div class="h-full bg-blue-500" style="width: 30%;"></div>
+            </div>
+          </div>
+          
+          <div class="text-xs">
+            <span>00:12</span>
+            <span>/ 04:12</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 这里可以添加交互逻辑
+    document.addEventListener('DOMContentLoaded', function() {
+      // 弹窗相关元素
+      const modalOverlay = document.getElementById('modalOverlay');
+      const annotationModal = document.getElementById('annotationModal');
+      const closeModal = document.getElementById('closeModal');
+      const cancelModal = document.getElementById('cancelModal');
+      const splitTool = document.getElementById('splitTool');
+      const sliceNames = document.querySelectorAll('.slice-name');
+      
+      // 原始脚本搜索相关元素
+      const scriptSearch = document.getElementById('scriptSearch');
+      const scriptOptions = document.getElementById('scriptOptions');
+      const scriptOptionItems = scriptOptions.querySelectorAll('div');
+      
+      // 显示弹窗的函数
+      function showAnnotationModal() {
+        modalOverlay.classList.remove('hidden');
+        annotationModal.classList.remove('hidden');
+      }
+      
+      // 关闭弹窗的函数
+      function closeAnnotationModal() {
+        modalOverlay.classList.add('hidden');
+        annotationModal.classList.add('hidden');
+        // 关闭脚本选项列表
+        scriptOptions.classList.add('hidden');
+      }
+      
+      // 点击分割切片图标显示弹窗
+      splitTool.addEventListener('click', showAnnotationModal);
+      
+      // 点击切片名显示弹窗
+      sliceNames.forEach(function(sliceName) {
+        sliceName.addEventListener('click', showAnnotationModal);
+      });
+      
+      // 点击关闭按钮
+      closeModal.addEventListener('click', closeAnnotationModal);
+      
+      // 点击取消按钮
+      cancelModal.addEventListener('click', closeAnnotationModal);
+      
+      // 点击遮罩层关闭弹窗
+      modalOverlay.addEventListener('click', closeAnnotationModal);
+      
+      // 按Escape键关闭弹窗
+      document.addEventListener('keydown', function(e) {
+        if(e.key === 'Escape') {
+          closeAnnotationModal();
+        }
+      });
+      
+      // 原始脚本搜索功能
+      // 点击输入框显示选项列表
+      scriptSearch.addEventListener('click', function(e) {
+        e.stopPropagation();
+        scriptOptions.classList.toggle('hidden');
+      });
+      
+      // 输入时进行模糊搜索
+      scriptSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        scriptOptionItems.forEach(function(item) {
+          const text = item.textContent.toLowerCase();
+          if(text.includes(searchTerm)) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+        // 如果输入框有内容，显示选项列表
+        if(searchTerm) {
+          scriptOptions.classList.remove('hidden');
+        }
+      });
+      
+      // 点击选项将值填入输入框
+      scriptOptionItems.forEach(function(item) {
+        item.addEventListener('click', function(e) {
+          e.stopPropagation();
+          scriptSearch.value = this.textContent;
+          scriptOptions.classList.add('hidden');
+        });
+      });
+      
+      // 点击其他区域关闭选项列表
+      document.addEventListener('click', function() {
+        scriptOptions.classList.add('hidden');
+      });
+      
+      // 防止点击选项列表时触发关闭
+      scriptOptions.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+      
+      // 窗口拖拽和调整大小逻辑可以在这里实现
+    });
+  </script>
+</body>
+</html>

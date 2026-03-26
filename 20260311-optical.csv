@@ -1,0 +1,1044 @@
+﻿id,name,count,scene,modality,steps,steps_CN,actors_num,seat,tags,items,items_untrack,capture_mode,hints,hints_CN,source,desc
+20260311000058 ,Posture-lie,1,MWV,,"1. Lie flat on your back on the floor, letting the back of your head, shoulders, and hips press into the ground.
+
+2. Lie face down on the floor with your legs long behind you and your forearms resting on the ground.
+
+3. Lie on your side on the floor with your knees slightly bent, keeping one shoulder and one hip clearly supported by the ground.
+
+4. Lie on your back and slowly roll onto your side and back again without getting up, repeatedly.
+
+5. Lie on your stomach and gently shift your weight so your pelvis and chest alternately press more firmly into the floor, repeatedly.
+
+6. Lie on your back with both knees bent and your feet planted on the floor, keeping your shoulders and hips supported by the ground.
+
+7. Lie on your side and slide your top leg forward and back along the floor while staying down, repeatedly.
+
+8. Lie on your back and make slow “snow-angel” sweeps with your arms along the floor while staying flat, repeatedly.
+
+9. Lie face down and push your chest a little away from the floor using your forearms, then lower back down to the ground, repeatedly.
+
+10. Lie on your back and slowly slide your heels away and back along the floor while keeping your upper body down, repeatedly.","1. 仰躺在地上，让后脑勺、肩膀和髋部都压实贴地。
+参考画面：平躺
+
+2. 俯卧在地上，双腿向后伸直，前臂放在地面支撑。
+参考画面：趴着
+
+3. 侧躺在地上，膝盖微屈，保持一侧肩和一侧髋清楚地贴地支撑。
+参考画面：侧躺
+
+4. 仰躺，慢慢翻到侧躺再翻回仰躺，全程不起来，重复执行。
+参考画面：烙饼翻身
+
+5. 俯卧，轻轻转移重心，让骨盆和胸部轮流更用力压向地面，重复执行。
+参考画面：前后压地
+
+6. 仰躺，双膝弯曲、双脚踩地，肩膀和髋部保持贴地支撑。
+参考画面：仰卧屈膝
+
+7. 侧躺不起来，上侧腿贴地向前滑、再向后滑，重复执行。
+参考画面：腿前后滑
+
+8. 仰躺贴平，双臂沿地面慢慢做“雪天使”式开合扫动，重复执行。
+参考画面：雪天使
+
+9. 俯卧，用前臂把胸口轻轻撑离地面一点，再放回贴地，重复执行。
+参考画面：海豹撑起
+
+10. 仰躺，上半身贴地不动，脚跟沿地面慢慢向外滑远、再滑回，重复执行。
+参考画面：脚跟滑动",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000059 ,Posture-sit,1,MWV,,"1. Sit on the floor with your legs straight in front of you, keeping your weight clearly on your buttocks and your back upright.
+
+2. Sit on the floor cross-legged with your hands resting on the ground beside you for support.
+
+3. Sit on the floor with your knees bent and your feet flat, lightly rocking your torso forward and back while staying seated, repeatedly.
+
+4. Sit on the floor with legs extended and scoot forward from center to A using your hands and hips while staying seated.
+
+5. Sit on the floor and scoot backward from A to B while staying upright on your buttocks.
+
+6. Sit on the floor and shuttle between A and B by scooting on your buttocks while keeping your torso mostly upright.
+
+7. Sit on the floor and side-step-scoot along the edge from B to C while staying seated and using your hands for balance.
+
+8. Sit on the floor with your knees hugged close to your chest, keeping your weight grounded through your buttocks.
+
+9. Sit on the floor and place both hands behind you on the ground, then lift and lower your hips slightly while staying seated, repeatedly.
+
+10. Sit on the floor and walk a figure-eight around center by scooting on your buttocks, using your hands on the ground to steer.","1. 坐在地上，双腿向前伸直，重心清楚落在臀部，背部保持直立。
+参考画面：长坐
+
+2. 盘腿坐地，双手放在身体两侧地面上支撑。
+参考画面：盘腿坐
+
+3. 坐在地上，双膝弯曲、双脚踩地，保持坐着，躯干轻轻前后摇，重复执行。
+参考画面：坐着摇摆
+
+4. 坐在地上，双腿伸直，用手和髋部发力，保持坐姿从中心往前挪到 A。
+参考画面：臀部挪步
+
+5. 坐在地上，臀部坐直不塌，从 A 往后挪到 B。
+参考画面：倒挪屁股
+
+6. 坐在地上，躯干基本直立，用臀部挪动在 A 和 B 之间来回穿梭。
+参考画面：屁股走路
+
+7. 坐在地上，沿边从 B 到 C 侧向挪步式前进，双手辅助保持平衡。
+参考画面：侧挪屁股
+
+8. 坐在地上，双膝抱到胸前，重心稳稳落在臀部贴地。
+参考画面：抱膝坐
+
+9. 坐在地上，双手撑在身后地面上，髋部轻轻抬起一点再放下，重复执行。
+参考画面：小桥式
+
+10. 坐在地上，用臀部挪动绕中心走“8”字，双手在地上辅助转向。
+参考画面：屁股画8",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000060 ,Posture-sprawl,1,MWV,,"1. Sprawl on your back on the floor with your arms and legs spread wide in an awkward, loose position.
+
+2. Sprawl face down on the floor with your elbows out and one knee bent out to the side, taking up extra space.
+
+3. Sprawl on your side with your top arm and top leg flung forward so your limbs look messy and spread out.
+
+4. Sprawl on your back and lazily slide your arms and legs farther out and back in along the floor, repeatedly.
+
+5. Sprawl seated on the floor with your legs stretched out and apart and your hands braced on the ground behind you, looking slack and ungainly.
+
+6. Sprawl on your back with one leg bent and dropped outward and the other leg long, shifting which hip presses the floor more, repeatedly.
+
+7. Sprawl face down and drag your forearms outward and inward on the floor while your legs stay splayed, repeatedly.
+
+8. Sprawl on your back and roll loosely from side to side without gathering your limbs in, repeatedly.
+
+9. Sprawl seated with your knees bent and dropped open, feet far apart, and your hands on the floor to either side.
+
+10. Sprawl on your back and slowly slide your heels in wide arcs along the floor, keeping your legs spread out, repeatedly.","1. 仰躺摊在地上，手脚大幅张开，姿势松散别扭。
+参考画面：大字摊
+
+2. 俯卧摊在地上，手肘向外张开，一侧膝盖向外侧弯开，身体占开更大面积。
+参考画面：趴着摊开
+
+3. 侧躺摊开，上侧手臂和上侧腿甩向前方，让四肢看起来凌乱地伸展开。
+参考画面：侧躺摊开
+
+4. 仰躺摊开，懒散地让手脚沿地面再滑得更开、再滑回一些，重复执行。
+参考画面：摊开伸缩
+
+5. 坐着摊在地上，双腿伸直分开，双手在身后撑地，身体松垮笨拙。
+参考画面：坐着摊开
+
+6. 仰躺摊开，一条腿弯曲向外倒，另一条腿伸直，左右交替让哪侧髋部更用力压地，重复执行。
+参考画面：左右压髋
+
+7. 俯卧摊开，双腿保持外展，前臂在地面上向外拖开、再向内拖回，重复执行。
+参考画面：前臂拖地
+
+8. 仰躺摊开，不把四肢收拢，身体松散地左右翻滚，重复执行。
+参考画面：摊着翻滚
+
+9. 坐着摊开，双膝弯曲向外打开，双脚分得很开，双手放在身体两侧地面上。
+参考画面：青蛙坐
+
+10. 仰躺摊开，双腿保持外展，脚跟沿地面画大弧线慢慢滑动，重复执行。
+参考画面：脚跟画弧",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000061 ,Posture-kneel,1,MWV,,"1. Kneel on both knees on the floor with your torso upright, keeping your shins and knees as the clear support points.
+
+2. Kneel on one knee with the other foot planted in front, keeping most of your weight resting through the kneeling knee.
+
+3. Kneel on both knees and lean forward to place both hands on the floor, then return to upright kneeling, repeatedly.
+
+4. Kneel on both knees and shift your hips so more weight moves onto one knee and then the other, repeatedly.
+
+5. Kneel with your toes tucked under and gently rock forward and back so your shins and toes alternately press the floor more, repeatedly.
+
+6. Kneel low on both knees and “walk” your knees forward and back a little while staying on your knees, repeatedly.
+
+7. Kneel on both knees and sit your hips back toward your heels, then come back to tall kneeling, repeatedly.
+
+8. Kneel on one knee and slide the planted foot a little forward and back on the floor while keeping the kneeling knee down, repeatedly.
+
+9. Kneel and reach one hand to touch the floor just ahead of you, then switch to the other hand, repeatedly.
+
+10. Kneel on both knees with your hands resting on your thighs, keeping your knees and shins firmly grounded.","1. 双膝跪地，躯干直立，清楚用小腿和膝盖作为支撑点。
+参考画面：双膝跪
+
+2. 单膝跪地，另一只脚在前方踩稳，重心主要压在跪地那侧膝盖上。
+参考画面：单膝跪
+
+3. 双膝跪地，身体前倾把双手放到地上，再回到直立跪姿，重复执行。
+参考画面：跪着点地
+
+4. 双膝跪地，左右移动髋部，让重心更多压到一侧膝盖再换到另一侧，重复执行。
+参考画面：左右压膝
+
+5. 跪姿把脚趾勾住地面，轻轻前后摇，让小腿和脚趾轮流更用力压地，重复执行。
+参考画面：跪着前后摇
+
+6. 双膝低跪，保持跪着，用膝盖小幅向前“走”一点再向后“走”一点，重复执行。
+参考画面：膝盖走路
+
+7. 双膝跪地，髋部坐回靠近脚跟，再回到高跪直立，重复执行。
+参考画面：跪坐起身
+
+8. 单膝跪地，跪地那侧膝盖不离地，前脚在地面上小幅向前滑、再向后滑，重复执行。
+参考画面：前脚滑动
+
+9. 跪姿，伸一只手去触碰身体前方一点的地面，再换另一只手，重复执行。
+参考画面：左右点地
+
+10. 双膝跪地，双手放在大腿上，膝盖和小腿稳稳贴地。
+参考画面：跪坐",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000062 ,Posture-huddle,1,MWV,,"1. Huddle on the floor by curling into a tight ball with your knees drawn close and your arms wrapped around your legs.
+
+2. Huddle seated on the floor with your feet close to you and your torso folded down toward your thighs, keeping your body compact.
+
+3. Huddle on your side with your knees tucked up and your arms pulled in tight, taking up as little space as possible.
+
+4. Huddle low on the floor and gently rock your compact curled shape forward and back without opening up, repeatedly.
+
+5. Huddle on the floor and make small side-to-side rolls while staying tightly curled, repeatedly.
+
+6. Huddle in a deep squat with your heels down and your arms pulled close to your body, keeping your shape small.
+
+7. Huddle on the floor with your knees tucked close and both hands on the ground near your feet for support, staying compact.
+
+8. Huddle seated and scoot a short distance from center to A without uncurling much, keeping your body tightly tucked.
+
+9. Huddle and shuttle between A and B by scooting while curled up, keeping your knees tucked close the whole way.
+
+10. Huddle on the floor and alternately press your forearms into the ground and relax them while staying curled tight, repeatedly.","1. 在地上蜷成紧紧一团，膝盖收近，双臂环抱住双腿。
+参考画面：抱团
+
+2. 坐在地上，双脚收近身体，躯干向大腿方向折叠下去，让身体尽量紧凑。
+参考画面：坐着抱团
+
+3. 侧躺蜷缩，膝盖收起，双臂紧紧收在身前，尽量占最小空间。
+参考画面：侧抱团
+
+4. 低位蜷缩在地上，不打开身体，保持紧凑形状轻轻前后摇，重复执行。
+参考画面：抱团摇摆
+
+5. 在地上紧紧蜷着，做小幅左右滚动，重复执行。
+参考画面：抱团滚动
+
+6. 深蹲蜷缩，脚跟落地，双臂贴近身体，保持身体很小一团。
+参考画面：深蹲抱团
+
+7. 在地上蜷缩，膝盖收很近，双手放在脚边地面上支撑，保持紧凑。
+参考画面：抱团撑地
+
+8. 坐着蜷缩，身体尽量不展开，从中心短距离挪到 A，保持紧紧收拢。
+参考画面：抱团挪动
+
+9. 蜷缩着用挪动在 A 和 B 之间来回穿梭，全程膝盖都收得很近。
+参考画面：抱团穿梭
+
+10. 在地上紧紧蜷着，前臂交替用力压地再放松，重复执行。
+参考画面：前臂压地",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000063 ,Posture-crouch,1,MWV,,"1. Sink into a deep crouch with your knees bent and your upper body leaning forward, keeping both hands on the floor for support.
+
+2. Hold a low crouch and shift your weight slowly between your feet while one hand stays pressed to the floor, repeatedly.
+
+3. Crouch very low and let your forearms rest on your thighs while your hands occasionally tap the floor for balance, repeatedly.
+
+4. Drop into a crouch and keep one knee lightly touching the floor as you lean your torso forward and back, repeatedly.
+
+5. Hold a crouch with your heels lifted and both palms flat on the floor in front of you, like a ready stance.
+
+6. Crouch low and slowly “crawl” your hands forward and back on the floor while your feet stay planted, repeatedly.
+
+7. Crouch and take small steps forward from center to A, keeping one hand skimming close to the floor as you move.
+
+8. Crouch low and walk backward from B to center, keeping your upper body pitched forward and one hand ready to touch the floor.
+
+9. Crouch and side-step along the edge from C to D, keeping your torso forward and brushing the floor with your hand now and then, repeatedly.
+
+10. Stay in a crouch and shuttle between A and B with short steps, keeping both hands low and briefly touching the floor at each turn, repeatedly.","1. 下沉到深蹲，膝盖弯曲，上身前倾，双手撑地支撑。
+参考画面：四点蹲
+
+2. 保持低蹲，慢慢在两脚之间转移重心，一只手始终按在地上，重复执行。
+参考画面：蹲着换重心
+
+3. 蹲得很低，前臂搭在大腿上，双手偶尔点一下地面找平衡，重复执行。
+参考画面：蹲着点地
+
+4. 蹲下后让一侧膝盖轻轻点地，躯干前后倾动，重复执行。
+参考画面：蹲着前后晃
+
+5. 保持蹲姿，脚跟抬起，双掌平放在身前地面上，像准备起跑的架势。
+参考画面：起跑姿势
+
+6. 低蹲，双脚踩稳不动，双手在地面上慢慢向前“爬”一点再向后“爬”一点，重复执行。
+参考画面：手爬前后
+
+7. 蹲着从中心小步往前走到 A，移动时一只手贴近地面掠过。
+参考画面：蹲走
+
+8. 低蹲，身体前倾，从 B 倒着走回中心，一只手随时准备触地。
+参考画面：蹲着倒走
+
+9. 低蹲沿边从 C 侧移到 D，躯干前倾，手不时刷一下地面，重复执行。
+参考画面：蹲着侧移
+
+10. 保持蹲姿，用短步在 A 和 B 之间来回穿梭，每次转向时双手放低并短暂触地，重复执行。
+参考画面：蹲着穿梭",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000064 ,Posture-cower,1,MWV,,"1. Curl into a tight, protective cower close to the floor, wrapping your arms around your belly and chest and keeping your head down.
+
+2. Drop into a low cower with your knees drawn in and your forearms pressed to the floor in front of you, shielding your torso.
+
+3. Hold a compact cower on the ground with one forearm over the top of your head and the other arm hugging your ribs.
+
+4. Cower low with your knees tucked under you, then tighten into a smaller ball and loosen slightly without rising, repeatedly.
+
+5. Cower with your back rounded and your elbows drawn in, rocking gently so your hands and forearms alternately press into the floor, repeatedly.
+
+6. Sit low on your feet in a cower and fold forward until your hands and forearms rest on the floor, keeping your torso shielded.
+
+7. Cower while walking a figure-eight around center with very small steps, keeping your arms tight across your torso and your body low.
+
+8. Stay in a hunched cower and side-step from A to B, keeping one arm across your chest and the other hand close to the floor for support.
+
+9. Cower low and shuttle between C and D, curling your torso inward and briefly placing a hand on the floor at each change of direction, repeatedly.
+
+10. Cower while walking backward from D to center, keeping your knees bent, your shoulders rounded, and your arms shielding your belly and chest.","1. 贴近地面蜷成紧张的防护缩身，双臂抱住腹部和胸口，头低下。
+参考画面：护身缩成团
+
+2. 缩到很低，膝盖收进来，前臂压在身前地面上，护住躯干。
+参考画面：趴护缩身
+
+3. 在地上保持紧凑缩身，一侧前臂盖在头顶上方，另一只手臂抱住肋部。
+参考画面：抱头缩身
+
+4. 低位缩身，膝盖收在身下，然后再缩成更小一团、再稍微放松一点但不站起，重复执行。
+参考画面：缩紧放松
+
+5. 缩身背部拱起、手肘收紧，轻轻摇动，让双手和前臂轮流更用力压地，重复执行。
+参考画面：缩身摇摆
+
+6. 缩身坐在脚跟上，向前折叠直到双手和前臂放到地上，躯干保持护住。
+参考画面：跪趴护身
+
+7. 保持低位缩身，用很小的步子绕中心走“8”字，双臂紧贴横抱在躯干前，身体保持低。
+参考画面：缩身走8
+
+8. 保持弓背缩身，从 A 侧移到 B，一只手臂横在胸前，另一只手贴近地面用于支撑。
+参考画面：缩身侧移
+
+9. 低位缩身，在 C 和 D 之间来回穿梭，躯干向内卷，每次换方向时短暂把一只手放到地上，重复执行。
+参考画面：缩身穿梭
+
+10. 缩身状态下从 D 倒着走回中心，膝盖弯曲、肩膀圆起，双臂护住腹部和胸口。
+参考画面：缩身倒走",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000065 ,Body_movement-wriggle,1,MWV,,"1. Lie on your back and wriggle your hips and shoulders side to side so your body squirms against the floor, repeatedly.
+
+2. Lie on your stomach and wriggle forward with quick, worm-like body twists while staying low to the floor, repeatedly.
+
+3. Sit on the floor and wriggle your torso with fast twists so your shoulders and hips shift in opposite directions, repeatedly.
+
+4. Kneel and wriggle your upper body with quick, writhing twists while your knees stay planted on the ground, repeatedly.
+
+5. On hands and knees, wriggle your body by rapidly twisting your torso and hips in small alternating directions, repeatedly.
+
+6. With both feet on the floor, wriggle one foot by making quick side-to-side twists at the ankle while the sole stays in contact, repeatedly.
+
+7. In a low squat, wriggle your hips with quick, tight side-to-side movements while your feet stay grounded, repeatedly.
+
+8. Shuttle between A and B in a low crouch while wriggling your torso in quick twists, repeatedly.
+
+9. Side-step along the edge from A to B while wriggling your hips with fast, writhing motions, repeatedly.
+
+10. Walk a figure-eight around center while wriggling your shoulders and torso in quick alternating twists, repeatedly.","1. 仰卧，髋和肩左右扭动，让身体在地面上像蠕动一样左右摆，重复执行。
+参考画面：地上扭动
+
+2. 俯卧，贴近地面，用快速的“虫式”身体扭转向前蠕动，重复执行。
+参考画面：蠕动前进
+
+3. 坐地，躯干快速扭动，让肩和髋朝相反方向错动，重复执行。
+参考画面：扭腰摆胯
+
+4. 跪姿，膝盖固定在地，上半身快速扭动蠕动，重复执行。
+参考画面：上身扭动
+
+5. 四点跪姿（手和膝着地），躯干和髋部快速做小幅交替扭动，让身体蠕动，重复执行。
+参考画面：蠕动
+
+6. 双脚踩地不抬起，单脚脚底保持贴地，脚踝快速左右拧动让脚“扭动”，重复执行。
+参考画面：脚底拧动
+
+7. 低位深蹲，双脚踩稳不动，髋部快速小幅左右抖动蠕动，重复执行。
+参考画面：扭胯
+
+8. 低位蹲伏，在 A 和 B 之间来回穿梭，同时躯干快速扭动蠕动，重复执行。
+参考画面：扭身
+
+9. 沿边从 A 侧步到 B，同时髋部快速扭动蠕动，重复执行。
+参考画面：扭胯
+
+10. 绕中心走“8”字，同时肩和躯干快速做交替扭转，重复执行。
+参考画面：扭身",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000066 ,Self_motion-crawl,1,MWV,,"1. Belly-crawl forward by pulling with your forearms and pushing with your knees, keeping your hips low, repeatedly.
+
+2. Crawl forward on hands and knees, letting your chest dip close to the floor every few steps, repeatedly.
+
+3. Crawl forward while sliding one knee along the floor instead of lifting it cleanly each step, repeatedly.
+
+4. Crawl forward and make a wide turn so you keep changing direction while staying low to the ground, repeatedly.
+
+5. Crawl forward on hands and knees and pivot on your knees at each turn to face a new direction, repeatedly.
+
+6. Shuttle between A and B by crawling forward on hands and knees and turning around at each end, repeatedly.
+
+7. Crawl a figure-eight around center on hands and knees, keeping your torso close to the floor, repeatedly.
+
+8. Shuttle between B and C by belly-crawling with your forearms pulling and your knees pushing, repeatedly.
+
+9. Crawl a figure-eight around center while keeping your knees wide and your hips low, repeatedly.
+
+10. Crawl forward on hands and knees while dragging your feet and knees lightly along the floor instead of stepping high, repeatedly.","1. 匍匐前进，用前臂往前拉、膝盖往后蹬，胯部压低贴地，重复执行。
+参考画面：匍匐前进
+
+2. 四肢着地往前爬，每隔几步让胸口下沉贴近地面，重复执行。
+参考画面：婴儿爬
+
+3. 往前爬时一侧膝盖每步都贴地滑行，不要抬起再落下，重复执行。
+参考画面：拖膝爬
+
+4. 低位往前爬，同时做大幅度转弯，方向不断变化但始终贴近地面，重复执行。
+参考画面：无
+
+5. 四肢着地往前爬，每次转向都用膝盖做轴心原地转身，转到新的方向再继续，重复执行。
+参考画面：跪地转向
+
+6. 四肢着地从 A 爬到 B，到端点就转身往回爬，A、B 间来回折返，重复执行。
+参考画面：爬行折返
+
+7. 四肢着地绕中心爬“8”字，躯干尽量贴近地面，重复执行。
+参考画面：8字爬
+
+8. 从 B 到 C 做匍匐折返：用前臂往前拉、膝盖往后蹬贴地前进，重复执行。
+参考画面：匍匐折返
+
+9. 绕中心爬“8”字，膝盖打开、胯部压低，重复执行。
+参考画面：8字爬
+
+10. 四肢着地往前爬，脚和膝盖轻轻拖地滑行，不要抬高迈步，重复执行。
+参考画面：拖地爬",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000067 ,Self_motion-slither,10,MWV,,"1. Slither forward on your belly with your legs together, making a smooth side-to-side wave through your torso, repeatedly.
+
+2. Slither across the floor by pushing from your hips and shoulders in an alternating twist, keeping your chest close to the ground, repeatedly.
+
+3. Slither while rolled partly onto one side, using a gentle full-body wiggle to glide along the floor, repeatedly.
+
+4. Slither forward with small, quick body ripples, like a snake on the floor, repeatedly.
+
+5. Slither forward and then slither back by reversing the same twisting wave through your body, repeatedly.
+
+6. Shuttle between A and D by slithering low on the floor with a smooth torso wave and turning around at each end, repeatedly.
+
+7. Slither a figure-eight around center, letting your shoulders and hips oscillate to steer the turns, repeatedly.
+
+8. Shuttle between B and C by slithering on your belly and using your forearms lightly for steering without lifting your torso, repeatedly.
+
+9. Slither forward with a long, smooth twist through your waist, then unwind as you continue gliding, repeatedly.
+
+10. Slither in a broad circle on the floor, keeping your body low and moving with a continuous side-to-side sway, repeatedly.","1. 趴着往前“蛇行”，双腿并拢，躯干做顺滑的左右波浪摆动，重复执行。
+参考画面：蛇行
+
+2. 贴地蛇行前进，肩和胯交替扭转发力推进，胸口始终贴近地面，重复执行。
+参考画面：蛇行
+
+3. 身体略侧翻在一边贴地蛇行，用轻柔的全身扭动带动滑行，重复执行。
+参考画面：侧身蛇行
+
+4. 贴地蛇行前进，身体做小而快的波纹式起伏，重复执行。
+参考画面：蛇行
+
+5. 先贴地蛇行向前，再用同样的扭转波浪反向蛇行回来，重复执行。
+参考画面：蛇行折返
+
+6. 从 A 到 D 贴地蛇行折返：躯干做顺滑波浪推进，到端点就转身往回，重复执行。
+参考画面：蛇行折返
+
+7. 绕中心贴地蛇行“8”字，用肩和胯的来回摆动来带转向，重复执行。
+参考画面：8字蛇行
+
+8. 从 B 到 C 贴地蛇行折返，前臂轻轻点地用来控方向，但躯干不要抬起，重复执行。
+参考画面：蛇行折返
+
+9. 贴地蛇行前进，腰部做长而顺的扭转带动前进，然后边滑行边把扭转慢慢解开，重复执行。
+参考画面：扭腰蛇行
+
+10. 贴地蛇行画大圆，身体压低，持续做左右摆动前进，重复执行。
+参考画面：画圆蛇行",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000068 ,Self_motion-wriggle,1,MWV,,"1. Wriggle forward on your belly using short, choppy hip and shoulder wiggles to inch along the floor, repeatedly.
+
+2. Wriggle forward with your knees bent and feet off the floor, pushing yourself along mainly by twisting your torso, repeatedly.
+
+3. Wriggle on your back and scoot by rocking your hips side to side to slide across the floor, repeatedly.
+
+4. Wriggle forward and make frequent small direction changes by snapping your hips to one side and then the other, repeatedly.
+
+5. Wriggle forward while keeping your chest low and using uneven, squirmy pushes from your knees, repeatedly.
+
+6. Shuttle between A and B by wriggling low along the floor and turning around at each end, repeatedly.
+
+7. Wriggle a figure-eight around center, using quick hip wiggles to steer each loop, repeatedly.
+
+8. Shuttle between C and D by wriggling forward with a tight, restless body squirm and staying close to the floor, repeatedly.
+
+9. Wriggle forward while your shoulders alternately press into the floor, creating a side-to-side crawl, repeatedly.
+
+10. Wriggle in place by scooting your hips in small side-to-side jerks while your upper body counters the motion, repeatedly.","1. 趴着往前蠕动，用短促、断续的肩和胯扭动一点点往前挪，重复执行。
+参考画面：蠕动前进
+
+2. 膝盖弯曲、双脚离地往前蠕动，主要靠躯干扭转把身体推着走，重复执行。
+参考画面：扭身蠕动
+
+3. 仰躺蠕动前进，胯部左右摇摆带动身体在地面上滑过去，重复执行。
+参考画面：仰躺蠕动
+
+4. 往前蠕动并频繁小幅变向，胯部快速甩向一侧再甩向另一侧来带方向，重复执行。
+参考画面：甩胯蠕动
+
+5. 胸口压低往前蠕动，用膝盖不均匀、扭扭挤挤地发力推进，重复执行。
+参考画面：贴地蠕动
+
+6. 从 A 到 B 贴地蠕动折返，到端点就转身往回，重复执行。
+参考画面：蠕动折返
+
+7. 绕中心蠕动“8”字，用快速摆胯来控制每个圈的转向，重复执行。
+参考画面：8字蠕动
+
+8. 从 C 到 D 贴地蠕动折返，身体紧凑不停扭动，始终贴近地面，重复执行。
+参考画面：贴地蠕动
+
+9. 往前蠕动时让左右肩轮流压地，带出左右摆的爬行轨迹，重复执行。
+参考画面：压肩蠕动
+
+10. 原地蠕动，胯部小幅左右抖动挪动，上半身做反向对抗保持平衡，重复执行。
+参考画面：原地摆胯",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000069 ,Self_motion-burrow,1,MWV,,"1. Burrow forward by pressing your forearms into the floor and making short digging-like pulls that drag your body ahead, repeatedly.
+
+2. Burrow forward on your knees and forearms, alternately “scooping” your arms and pushing with your knees to force ahead, repeatedly.
+
+3. Burrow forward while keeping your head and shoulders very low, driving ahead with compact, tunnel-like shoves, repeatedly.
+
+4. Burrow forward by twisting your torso as you pull with one forearm and then the other, as if working through something dense, repeatedly.
+
+5. Burrow in place by making alternating digging-like arm strokes against the floor and shifting your knees to creep forward and back, repeatedly.
+
+6. Shuttle between A and D by burrowing low on forearms and knees and turning around at each end, repeatedly.
+
+7. Burrow a figure-eight around center, keeping your torso close to the floor and using short “digging” pulls to progress, repeatedly.
+
+8. Shuttle between B and C by burrowing forward with compact, forceful knee pushes and forearm pulls, repeatedly.
+
+9. Burrow forward while your elbows stay bent and close, so you advance with short, powerful drags along the floor, repeatedly.
+
+10. Burrow forward with your body curled slightly, using repeated shoulder-and-forearm drives that look like digging into a surface, repeatedly.","1. 像“打洞”一样往前钻：前臂压地做短促的挖掘式回拉，把身体拖向前，重复执行。
+参考画面：打洞前进
+
+2. 用膝盖和前臂往前钻，手臂交替做“舀/挖”式动作，膝盖同时往前顶推，重复执行。
+参考画面：打洞前进
+
+3. 往前钻时头和肩压得很低，用紧凑、像在洞里顶进的短推来前进，重复执行。
+参考画面：打洞前进
+
+4. 往前钻时躯干带扭转，一侧前臂拉一下再换另一侧拉一下，像在挤过很密的东西，重复执行。
+参考画面：打洞前进
+
+5. 原地做“打洞”动作：手臂交替做挖掘式划拉，同时挪动膝盖让身体前后小幅爬动，重复执行。
+参考画面：原地打洞
+
+6. 从 A 到 D 用前臂和膝盖贴地往前钻，到端点就转身往回，重复执行。
+参考画面：打洞折返
+
+7. 绕中心用“打洞”式前进画“8”字，躯干贴近地面，用短促的挖掘式回拉推进，重复执行。
+参考画面：8字打洞
+
+8. 从 B 到 C 用“打洞”式折返：膝盖紧凑有力地顶推，前臂用力回拉前进，重复执行。
+参考画面：打洞折返
+
+9. 往前钻时手肘始终弯曲并夹紧，用短而有力的贴地拖拽来前进，重复执行。
+参考画面：打洞前进
+
+10. 身体微微蜷起往前钻，肩和前臂反复发力推进，动作像在地面上挖掘，重复执行。
+参考画面：打洞前进",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000070 ,Self_motion-scramble,10,MWV,,"1. Scramble forward in a hurry on hands and feet, letting your hands slap down for balance as you surge ahead, repeatedly.
+
+2. Scramble forward low to the ground with quick, uneven steps, using your hands to steady yourself as needed, repeatedly.
+
+3. Scramble backward on hands and feet, moving fast while keeping your hips low, repeatedly.
+
+4. Scramble forward and make sharp turns by planting a hand on the floor to pivot your body around, repeatedly.
+
+5. Scramble in a broad circle, staying in a low crouch and touching a hand to the ground whenever you change direction, repeatedly.
+
+6. Shuttle between A and B by scrambling quickly on hands and feet and turning around at each end, repeatedly.
+
+7. Scramble a figure-eight around center, moving hurriedly and using your hands on the floor to stabilize the tight turns, repeatedly.
+
+8. Side-step along the edge from B to C in a hurried shuffle, occasionally tapping a hand to the floor for balance, repeatedly.
+
+9. Shuttle between C and D by scrambling low and fast, briefly dropping both hands to the floor during each change of direction, repeatedly.
+
+10. Scramble forward in short bursts, dropping your hands to the floor at the start of each burst like a quick climb over low ground, repeatedly.","1. 手脚并用快速往前窜，手掌拍地借力保持平衡，重复执行。
+参考画面：手脚并用
+
+2. 贴地低位快速乱步往前窜，需要时用手撑地稳住身体，重复执行。
+参考画面：手脚并用
+
+3. 手脚并用快速往后窜，胯部压低，重复执行。
+参考画面：手脚并用
+
+4. 手脚并用往前窜，急转弯时一只手撑地做支点把身体甩过去，重复执行。
+参考画面：撑手急转
+
+5. 低位蹲着手脚并用绕大圈移动，每次变向都用一只手点地稳住，重复执行。
+参考画面：手脚并用
+
+6. 从 A 到 B 手脚并用快速折返，到端点就转身往回，重复执行。
+参考画面：手脚并用
+
+7. 绕中心手脚并用跑“8”字，动作急，转弯紧时用手撑地稳住，重复执行。
+参考画面：8字窜动
+
+8. 沿边从 B 侧移到 C，快速小碎步横移，偶尔用手点地保持平衡，重复执行。
+参考画面：侧移小碎步
+
+9. 从 C 到 D 低位快速折返，每次变向时短暂双手同时落地撑一下，重复执行。
+参考画面：低位折返
+
+10. 往前短促冲刺式窜动，每次起冲时双手先落地一下，像快速翻越低矮地面那样，重复执行。
+参考画面：短冲窜动",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000071 ,Change_posture-lie_down,1,MWV,,"1. Lower yourself all the way down onto the floor until your body is fully horizontal on your back, then come back up to standing, repeatedly.
+
+2. Bend down, bring your hands to the floor, and smoothly lie down onto your stomach so your whole front is supported by the floor, then get back up, repeatedly.
+
+3. Drop to both knees, tip onto one hip, and lie down fully on your side on the floor, then rise back up, repeatedly.
+
+4. From a squat, ease down until your back and shoulders reach the floor and you are lying flat, then return to standing, repeatedly.
+
+5. Lower down to the floor and lie down with your knees bent and feet on the floor, then sit up and stand, repeatedly.
+
+6. Slide one hand along the floor as you descend and lie down fully on the floor, then push up to standing again, repeatedly.
+
+7. Walk a figure-eight around center, and at a natural point in the path lower yourself to the floor to lie down flat, then get back up and continue, repeatedly.
+
+8. Shuttle between A and B, and whenever you arrive, lie down fully on the floor before getting up to head back, repeatedly.
+
+9. Side-step along the edge from A to B, and at a moment you choose, lower down and lie down fully on the floor, then get up and continue side-stepping, repeatedly.
+
+10. Walk backward from A to B, and near the end lower yourself to the floor until you are lying flat, then get back up and continue, repeatedly.","1. 慢慢下到地面，仰躺到身体完全平躺，再起身站起来，重复执行。
+参考画面：仰卧起身
+
+2. 弯腰把手撑到地上，顺势平稳趴下，让整个身体正面贴地支撑；再起身，重复执行。
+参考画面：俯卧起身
+
+3. 双膝跪地，身体倒向一侧髋部，侧躺到地面完全躺平；再起身，重复执行。
+参考画面：侧卧起身
+
+4. 从下蹲开始，慢慢往下放，直到背和肩碰到地面、仰躺平躺；再站起来，重复执行。
+参考画面：仰卧起身
+
+5. 下到地面仰躺，膝盖弯曲、脚踩地；再坐起并站起来，重复执行。
+参考画面：仰卧起身
+
+6. 下落时一只手沿地面滑着支撑，直到身体完全躺到地上；再撑起站起来，重复执行。
+参考画面：侧撑躺下
+
+7. 绕中心走“8”字路线，走到路径中自然的时机下到地面平躺；再起身继续走，重复执行。
+参考画面：仰卧起身
+
+8. 在 A 和 B 之间往返走，每次到达时先完全躺到地面，再起身往回走，重复执行。
+参考画面：仰卧起身
+
+9. 沿边从 A 侧步到 B，自己选一个时机下到地面完全躺平；再起身继续侧步，重复执行。
+参考画面：仰卧起身
+
+10. 从 A 倒走到 B，接近终点时下到地面直到平躺；再起身继续，重复执行。
+参考画面：仰卧起身",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000072 ,Change_posture-sprawl,1,MWV,,"1. Lower yourself to the floor and sprawl in an ungainly way with your limbs spread out wide on the ground, then gather in and stand up again, repeatedly.
+
+2. Let yourself drop down to a seated position and then slump into a floor sprawl with legs and arms spread, then pull yourself back up, repeatedly.
+
+3. From standing, sink down and let your body fall onto the floor in a controlled way, landing in a messy sprawl with limbs splayed, then rise, repeatedly.
+
+4. Drop to both knees and tip forward until you end up sprawled on the floor with your arms and legs spread out, then get back up, repeatedly.
+
+5. Lower onto your side and roll onto the floor into a loose, ungainly sprawl with limbs spread, then recover to standing, repeatedly.
+
+6. Sit down onto the floor and immediately let yourself spill outward into a wide sprawl, then tuck back in and stand, repeatedly.
+
+7. Walk a figure-eight around center, and each time you pass the middle, drop down into a splayed-out sprawl on the floor before getting up and continuing, repeatedly.
+
+8. Shuttle between A and B, and at one end drop down into an ungainly sprawl on the floor with limbs spread before standing to head back, repeatedly.
+
+9. Side-step along the edge from A to B, then sink down and sprawl on the floor with your limbs splayed before getting up to continue, repeatedly.
+
+10. Walk backward from A to B, then lower down and end in a loose sprawl on the floor with arms and legs spread out, then stand and continue, repeatedly.","1. 下到地面，四肢大幅张开摊在地上（动作笨拙随意）；再收拢起身站起，重复执行。
+参考画面：大字摊
+
+2. 直接落坐到地上，然后身体塌下去摊开成“大字”状（手脚张开）；再把身体拉起，重复执行。
+参考画面：大字摊
+
+3. 从站立开始下沉，控制着让身体倒到地上，落地时四肢散开、姿势凌乱地摊开；再起身，重复执行。
+参考画面：大字摊
+
+4. 双膝跪地，身体向前倾直到摊在地上，手脚张开；再起身，重复执行。
+参考画面：大字摊
+
+5. 侧身下到地面并滚到地上，变成松散笨拙的摊开姿势（四肢张开）；再恢复站立，重复执行。
+参考画面：大字摊
+
+6. 坐到地上后立刻向外“散开”成大幅摊开姿势；再收拢起身站起，重复执行。
+参考画面：大字摊
+
+7. 绕中心走“8”字路线，每次经过中间时就下去摊开成手脚张开的姿势；再起身继续走，重复执行。
+参考画面：大字摊
+
+8. 在 A 和 B 之间往返，在其中一端下去摊开成笨拙的手脚张开姿势；再站起往回走，重复执行。
+参考画面：大字摊
+
+9. 沿边从 A 侧步到 B，然后下沉摊到地上，四肢张开；再起身继续，重复执行。
+参考画面：大字摊
+
+10. 从 A 倒走到 B，然后下到地面，最后变成松散的摊开姿势（手脚张开）；再站起继续，重复执行。
+参考画面：大字摊",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000073 ,Change_posture-sprawl_out,10,MWV,,"1. Lower yourself to the floor and sprawl out with your arms and legs stretched far apart on the ground, then pull back in and stand up, repeatedly.
+
+2. Drop down onto the floor and immediately sprawl out into a wide, awkward spread of limbs, then get back up, repeatedly.
+
+3. From a squat, let yourself sink to the floor and sprawl out flat with your limbs spread, then rise to standing again, repeatedly.
+
+4. Come down onto your knees and hands and then slide out into a full sprawl-out position on the floor with arms and legs spread, then stand back up, repeatedly.
+
+5. Lower down onto your back and let your arms and legs drift outward until you are sprawled out on the floor, then gather in and get up, repeatedly.
+
+6. Sit down on the floor and tip over into a sprawled-out position with limbs extended wide, then return to standing, repeatedly.
+
+7. Walk a figure-eight around center, and at a natural moment drop down and sprawl out wide on the floor before getting up and continuing, repeatedly.
+
+8. Shuttle between A and B, and at one end sprawl out flat on the floor with your arms and legs spread before getting up to go back, repeatedly.
+
+9. Side-step along the edge from A to B, then drop down and sprawl out wide on the floor, then stand and continue side-stepping, repeatedly.
+
+10. Walk backward from A to B, then lower down to the floor and sprawl out with limbs spread before standing and continuing, repeatedly.","1. 下到地面，手脚尽量伸开、拉得很远地摊在地上；再收回起身站起，重复执行。
+参考画面：大字摊
+
+2. 直接下到地面，立刻大幅摊开成别扭的四肢张开姿势；再起身，重复执行。
+参考画面：大字摊
+
+3. 从小蹲开始下沉到地面，平摊开来、四肢张开；再起身站直，重复执行。
+参考画面：大字摊
+
+4. 先手脚着地（双手双膝），再向外滑出去变成完全摊开姿势（手脚张开）；再站起来，重复执行。
+参考画面：大字摊
+
+5. 仰躺到地面，让手脚慢慢向外散开直到摊开在地上；再收拢起身，重复执行。
+参考画面：大字摊
+
+6. 坐到地上，身体侧倒成四肢大幅伸开的摊开姿势；再回到站立，重复执行。
+参考画面：大字摊
+
+7. 绕中心走“8”字路线，在自然的时机下去大幅摊开在地上；再起身继续，重复执行。
+参考画面：大字摊
+
+8. 在 A 和 B 之间往返，在其中一端平摊到地上，手脚张开；再起身往回走，重复执行。
+参考画面：大字摊
+
+9. 沿边从 A 侧步到 B，然后下去大幅摊开在地上；再站起继续侧步，重复执行。
+参考画面：大字摊
+
+10. 从 A 倒走到 B，然后下到地面摊开，四肢张开；再站起继续，重复执行。
+参考画面：大字摊",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000074 ,Change_posture-kneel_down,1,MWV,,"1. Lower yourself until both knees come to rest on the floor, then come back up to standing, repeatedly.
+
+2. Step forward and gently drop down to both knees on the floor, then rise back up, repeatedly.
+
+3. Bend down, touch the floor with your hands for support, and kneel down until both knees are on the ground, then stand back up, repeatedly.
+
+4. Lower to one knee and then bring the other knee down so you end resting on both knees on the floor, then return to standing, repeatedly.
+
+5. From a small squat, sink down and settle onto both knees on the floor, then rise, repeatedly.
+
+6. Turn your body slightly and kneel down onto the floor so your knees take your weight, then stand back up, repeatedly.
+
+7. Walk a figure-eight around center, and at a natural point kneel down so both knees touch the floor, then stand and continue, repeatedly.
+
+8. Shuttle between A and B, and whenever you arrive, kneel down onto both knees on the floor before standing to head back, repeatedly.
+
+9. Side-step along the edge from A to B, then kneel down onto both knees on the floor and stand to continue, repeatedly.
+
+10. Walk backward from A to B, then kneel down until both knees rest on the floor, then stand and continue, repeatedly.","1. 下沉直到双膝落地；再起身站直，重复执行。
+参考画面：双膝跪起
+
+2. 向前迈一步，轻轻落到双膝跪地；再起身，重复执行。
+参考画面：双膝跪起
+
+3. 弯腰用手撑地借力，跪下直到双膝着地；再站起来，重复执行。
+参考画面：双膝跪起
+
+4. 先单膝跪地，再把另一膝也放下，变成双膝跪地；再站起来，重复执行。
+参考画面：双膝跪起
+
+5. 从小蹲开始下沉，落到双膝跪地；再起身，重复执行。
+参考画面：双膝跪起
+
+6. 身体稍微转一点角度，跪下让膝盖承重；再站起来，重复执行。
+参考画面：双膝跪起
+
+7. 绕中心走“8”字路线，在自然的点位双膝跪地让两膝碰地；再站起继续，重复执行。
+参考画面：双膝跪起
+
+8. 在 A 和 B 之间往返，每次到达时先双膝跪地；再站起往回走，重复执行。
+参考画面：双膝跪起
+
+9. 沿边从 A 侧步到 B，然后双膝跪地；再站起继续，重复执行。
+参考画面：双膝跪起
+
+10. 从 A 倒走到 B，然后跪下直到双膝落地；再站起继续，重复执行。
+参考画面：双膝跪起",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000075 ,Change_posture-kneel_up,1,MWV,,"1. Sit on the floor, then kneel up so you come to rest on both knees, then sit back down, repeatedly.
+
+2. Lie on your back on the floor, then kneel up until you are upright on both knees, then return to lying, repeatedly.
+
+3. Lie on your stomach on the floor, then push yourself up to kneel up on both knees, then lower back down, repeatedly.
+
+4. Sit leaning slightly back on the floor, then kneel up into an upright kneeling position on both knees, then sit back down, repeatedly.
+
+5. From lying on your side on the floor, roll and kneel up until both knees are under you, then return to the floor, repeatedly.
+
+6. Sit on the floor with your hands briefly bracing on the ground, then kneel up to rest on both knees, then sit again, repeatedly.
+
+7. Walk a figure-eight around center, then drop to a seated position and kneel up onto both knees before standing to continue, repeatedly.
+
+8. Shuttle between A and B, and at one end sit down on the floor and kneel up onto both knees before getting up to go back, repeatedly.
+
+9. Side-step along the edge from A to B, then sit down and kneel up onto both knees before standing to continue, repeatedly.
+
+10. Walk backward from A to B, then lower to the floor into a seated position and kneel up onto both knees before standing to continue, repeatedly.","1. 先坐在地上，再起到双膝跪姿；再坐回地上，重复执行。
+参考画面：跪坐起落
+
+2. 地上仰躺，然后起到双膝跪直；再躺回去，重复执行。
+参考画面：跪坐起落
+
+3. 地上俯卧，然后撑起到双膝跪姿；再放下趴回去，重复执行。
+参考画面：跪坐起落
+
+4. 坐在地上身体稍微后仰，然后起到双膝跪直；再坐回去，重复执行。
+参考画面：跪坐起落
+
+5. 从地上侧躺开始，翻身起到双膝在身下的跪姿；再回到地面，重复执行。
+参考画面：跪坐起落
+
+6. 坐在地上，双手短暂撑地；再起到双膝跪姿；再坐下，重复执行。
+参考画面：跪坐起落
+
+7. 绕中心走“8”字路线，然后落坐到地上，再起到双膝跪姿，接着站起继续走，重复执行。
+参考画面：跪坐起落
+
+8. 在 A 和 B 之间往返，在其中一端坐到地上，再起到双膝跪姿，然后站起往回走，重复执行。
+参考画面：跪坐起落
+
+9. 沿边从 A 侧步到 B，然后坐下，再起到双膝跪姿，再站起继续，重复执行。
+参考画面：跪坐起落
+
+10. 从 A 倒走到 B，然后下到地面坐下，再起到双膝跪姿，再站起继续，重复执行。
+参考画面：跪坐起落",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000076 ,Change_posture-squat_down,10,MWV,,"1. From an upright stance, squat down until your knees are deeply bent and your heels come close to your thighs, then stand back up, repeatedly.
+
+2. Squat down onto the balls of your feet so your heels lift, letting your hips drop low toward your heels, then rise back up, repeatedly.
+
+3. Squat down very low and place both palms on the floor between your feet, then lift your hands and stand back up, repeatedly.
+
+4. Squat down until your thighs press close to your calves, briefly touch one knee to the floor, then stand back up, repeatedly.
+
+5. Drop into a deep squat and let your hands rest on the floor just in front of your feet, then push back up to standing, repeatedly.
+
+6. Squat down low as if sitting on your heels, keeping your feet flat and letting your hips sink, then return to standing, repeatedly.
+
+7. Side-step from A to B while staying in a low squat with bent knees, letting one hand tap the floor every few steps, repeatedly.
+
+8. Shuttle between A and B by squat-walking low, keeping your knees bent and your hips close to your heels, repeatedly.
+
+9. Walk a figure-eight around center and drop into a deep squat at each crossover point, briefly brushing both palms to the floor before rising, repeatedly.
+
+10. Walk backward from A to B and sink into a deep squat every few steps, letting your heels come close to your thighs before standing back up, repeatedly.","1. 站立开始深蹲，膝盖大幅弯曲，脚跟尽量靠近大腿；再站起，重复执行。
+参考画面：深蹲起
+
+2. 踮脚深蹲，脚跟抬起，臀部下沉靠近脚跟；再起身，重复执行。
+参考画面：踮脚深蹲
+
+3. 深蹲到很低，双手掌放在两脚之间的地面；再抬手站起，重复执行。
+参考画面：摸地深蹲
+
+4. 深蹲到大腿贴近小腿，短暂让一侧膝盖点一下地；再站起，重复执行。
+参考画面：点膝深蹲
+
+5. 下到深蹲，双手放在脚前方的地面上支撑；再撑起站直，重复执行。
+参考画面：撑地深蹲
+
+6. 脚掌踩平，像坐到脚跟上一样深蹲让臀部下沉；再站起，重复执行。
+参考画面：坐跟深蹲
+
+7. 从 A 低位深蹲侧步到 B，膝盖一直弯着；每走几步用一只手点一下地面，重复执行。
+参考画面：螃蟹蹲走
+
+8. 在 A 和 B 之间低位蹲走往返，膝盖保持弯曲，臀部尽量靠近脚跟，重复执行。
+参考画面：螃蟹蹲走
+
+9. 绕中心走“8”字路线，每次交叉点都下到深蹲，双手掌轻刷一下地面后再起身，重复执行。
+参考画面：摸地深蹲
+
+10. 从 A 倒走到 B，每走几步就下到深蹲，让脚跟尽量靠近大腿后再站起，重复执行。
+参考画面：深蹲起",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000077 ,Change_posture-crouch_down,1,MWV,,"1. From standing, crouch down by bending your knees and bringing your upper body forward and down, then stand back up, repeatedly.
+
+2. Crouch down until your chest comes closer to your knees and your hands touch the floor in front of you, then rise back to standing, repeatedly.
+
+3. Crouch down and bring one knee close to the floor while your upper body folds forward, then return to standing, repeatedly.
+
+4. Crouch down and place both palms flat on the floor, shifting your weight forward and back while staying low, repeatedly.
+
+5. Crouch down and touch both forearms lightly to the floor, then push back up to standing, repeatedly.
+
+6. Crouch down into a compact position with bent knees and your upper body forward, then rise halfway and crouch down again, repeatedly.
+
+7. Side-step from A to B while staying in a crouch with your upper body forward, letting your hand skim the floor now and then, repeatedly.
+
+8. Shuttle between A and B with a low crouch-walk, keeping your knees bent and your upper body tipped forward and down, repeatedly.
+
+9. Walk a figure-eight around center and crouch down at each turn, tapping the floor with both palms before moving on, repeatedly.
+
+10. Walk backward from A to B and drop into a forward-leaning crouch whenever you feel stable, then stand back up and continue, repeatedly.","1. 站立开始屈膝下蹲，上身向前下方收；再站起，重复执行。
+参考画面：抱膝缩身
+
+2. 下蹲到胸口更靠近膝盖，双手摸到身前地面；再站起，重复执行。
+参考画面：摸地缩身
+
+3. 下蹲并上身前折，让一侧膝盖靠近地面；再站起，重复执行。
+参考画面：单膝贴地
+
+4. 下蹲并双手掌贴地，保持低位，重心前后移动，重复执行。
+参考画面：撑地低蹲
+
+5. 下蹲并让两前臂轻轻碰一下地面；再撑起站直，重复执行。
+参考画面：前臂点地
+
+6. 下蹲缩成紧凑姿势（屈膝、上身前倾），然后起到半高再蹲回去，重复执行。
+参考画面：半起半蹲
+
+7. 从 A 到 B 侧步，保持低位前倾的蹲姿，手不时贴着地面掠过，重复执行。
+参考画面：螃蟹蹲走
+
+8. 在 A 和 B 之间低位蹲走往返，膝盖弯曲，上身前倾向下，重复执行。
+参考画面：螃蟹蹲走
+
+9. 绕中心走“8”字路线，每次转弯都下蹲，双手掌点一下地面再走，重复执行。
+参考画面：摸地低蹲
+
+10. 从 A 倒走到 B，觉得稳的时候就下到前倾的低蹲；再站起继续，重复执行。
+参考画面：抱膝缩身",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000078 ,Change_posture-hunch_up,1,MWV,,"1. From standing, hunch up by raising your shoulders and bending your upper body forward, then return to an upright stance, repeatedly.
+
+2. Sit down on the floor with your knees bent and feet on the floor, then hunch up by rounding forward with raised shoulders, repeatedly.
+
+3. Drop into a low squat and hunch up as small as you can with your shoulders lifted, then open back up to a taller stance, repeatedly.
+
+4. Kneel down so both knees touch the floor, then hunch up with your shoulders raised and your upper body curled forward, repeatedly.
+
+5. Sit on the floor and pull your knees close, wrapping your arms around your lower legs as you hunch up with raised shoulders, repeatedly.
+
+6. Hunch up in standing with your shoulders lifted, then fold further until your hands touch the floor, and come back up to standing, repeatedly.
+
+7. Side-step from A to B while staying hunched up with raised shoulders and a rounded upper body, repeatedly.
+
+8. Shuttle between A and B while keeping a hunched-up posture, dipping down so one hand briefly touches the floor on each pass, repeatedly.
+
+9. Walk a figure-eight around center while hunched up, and at each crossover sink low enough to tap the floor with both palms, repeatedly.
+
+10. Walk backward from A to B in a hunched-up posture with raised shoulders, occasionally curling down until your hands reach the floor, repeatedly.","1. 站立时耸肩含胸，上身向前弓起；再回到直立，重复执行。
+参考画面：耸肩含胸
+
+2. 坐在地上，膝盖弯曲脚踩地；然后耸肩含胸、上身前圆，重复执行。
+参考画面：耸肩含胸
+
+3. 下到低位深蹲，耸肩含胸尽量缩小；再打开身体站得更高些，重复执行。
+参考画面：缩成一团
+
+4. 双膝跪地，然后耸肩含胸、上身向前蜷起，重复执行。
+参考画面：耸肩含胸
+
+5. 坐地把膝盖抱近，双臂环抱小腿，同时耸肩含胸蜷起来，重复执行。
+参考画面：缩成一团
+
+6. 站立耸肩含胸，然后继续前折直到双手摸到地面；再站起，重复执行。
+参考画面：耸肩含胸
+
+7. 从 A 到 B 侧步移动，全程保持耸肩含胸、上身圆背，重复执行。
+参考画面：耸肩含胸
+
+8. 在 A 和 B 之间往返，保持耸肩含胸；每次经过时下沉一下，让一只手短暂摸到地面，重复执行。
+参考画面：耸肩含胸
+
+9. 绕中心走“8”字路线，全程耸肩含胸；每次交叉点下沉到能用双手掌点地，重复执行。
+参考画面：耸肩含胸
+
+10. 从 A 倒走到 B，保持耸肩含胸；偶尔蜷下去直到双手够到地面，重复执行。
+参考画面：耸肩含胸",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,
+20260311000079 ,Body_movement-roll,2,MWV,,"1. Lie on your back and do a slow log roll onto your stomach, then roll back onto your back, repeatedly.
+
+
+2. Lie on your side with your arms stacked and roll your whole body over as one unit, repeatedly.
+
+
+3. Lie on your back with knees bent and let your knees drop to one side so your hips and torso roll with them, then let them drop to the other side, repeatedly.
+
+
+4. Lie face down with your arms close to your sides and roll onto your back and back to face down without pushing off the floor with your hands, repeatedly.
+
+
+5. Sit down, lower onto your back, and roll your body to one side until you come back up to sitting, repeatedly.
+
+
+6. Lie on your back and roll your shoulders and hips together so your body rotates like a log with minimal bending, repeatedly.
+
+
+7. Shuttle between A and B by log-rolling on the floor, keeping your body straight as you rotate, repeatedly.
+
+
+8. Shuttle between B and C by rolling on the ground as one unit, repeatedly.
+
+
+9. Log-roll on the floor in a figure-eight around center, repeatedly.
+
+
+10. Shuttle between C and D by rolling on the ground and changing direction only when you reach each corner, repeatedly.","1. 仰卧，慢慢像“木头滚”一样翻身滚到俯卧，再滚回仰卧，重复执行。
+参考画面：木头滚
+
+2. 侧卧，双臂上下叠放，身体保持一体一起翻滚过去，重复执行。
+参考画面：木头滚
+
+3. 仰卧屈膝，让双膝倒向一侧，带着髋部和躯干一起滚过去；再让双膝倒向另一侧，重复执行。
+参考画面：雨刷摆腿
+
+4. 俯卧，双臂贴近身体两侧，不用手撑地发力，滚到仰卧再滚回俯卧，重复执行。
+参考画面：木头滚
+
+5. 坐下，躺到仰卧，然后把身体滚向一侧直到回到坐姿，重复执行。
+参考画面：侧滚起身
+
+6. 仰卧，肩和髋一起带动翻滚，让身体像“木头滚”一样旋转、尽量少弯曲，重复执行。
+参考画面：木头滚
+
+7. 在地上用“木头滚”在 A 和 B 之间往返，身体保持笔直边转边滚，重复执行。
+参考画面：木头滚
+
+8. 在地上身体保持一体翻滚，在 B 和 C 之间往返，重复执行。
+参考画面：木头滚
+
+9. 在地上做“木头滚”，绕着中心走“8”字路线翻滚，重复执行。
+参考画面：木头滚
+
+10. 在地上翻滚在 C 和 D 之间往返，只到每个角点时才换方向，重复执行。
+参考画面：木头滚",,,,,,Optical_Capture,Each task must be performed for a full minute.|Please assume the T-pose when starting and finishing each task.,每条任务需要执行满一分钟。|每条任务开始和结束时请摆 T pose。,NR,

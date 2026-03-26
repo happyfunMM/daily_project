@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 标注系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af',
+                        dark: {
+                            100: '#1f2937',
+                            200: '#111827',
+                            300: '#0f172a',
+                            400: '#0b1120'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .login-card {
+                @apply bg-dark-200 rounded-2xl shadow-2xl border border-gray-700 p-8 max-w-md w-full transition-all duration-300 hover:shadow-primary/20;
+            }
+            .input-field {
+                @apply bg-dark-100 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300;
+            }
+            .login-btn {
+                @apply bg-primary hover:bg-secondary text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2;
+            }
+            .social-btn {
+                @apply bg-dark-100 border border-gray-700 rounded-lg py-2 px-4 text-white hover:bg-dark-300 transition-all duration-300 flex items-center justify-center gap-2;
+            }
+            .form-label {
+                @apply block text-sm font-medium text-gray-300 mb-2;
+            }
+        }
+    </style>
+</head>
+<body class="dark bg-dark-400 min-h-screen flex items-center justify-center p-4">
+    <div class="login-card">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-lock text-2xl text-primary"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white">标注系统登录</h1>
+            <p class="text-gray-400 mt-2">请输入您的账号和密码</p>
+        </div>
+        
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="username" class="form-label">账号</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                        <i class="fa fa-user"></i>
+                    </span>
+                    <input type="text" id="username" class="input-field pl-10 w-full" placeholder="请输入账号" required>
+                </div>
+            </div>
+            
+            <div>
+                <label for="password" class="form-label">密码</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                        <i class="fa fa-lock"></i>
+                    </span>
+                    <input type="password" id="password" class="input-field pl-10 w-full" placeholder="请输入密码" required>
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-white">
+                        <i class="fa fa-eye-slash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="remember" type="checkbox" class="h-4 w-4 rounded border-gray-600 bg-dark-100 text-primary focus:ring-primary/50">
+                    <label for="remember" class="ml-2 block text-sm text-gray-300">记住我</label>
+                </div>
+                <a href="#" class="text-sm text-primary hover:text-secondary transition-colors duration-300">忘记密码？</a>
+            </div>
+            
+            <button type="submit" class="login-btn w-full">
+                <i class="fa fa-sign-in"></i>
+                <span>登录</span>
+            </button>
+        </form>
+        
+        <div class="mt-8">
+            <div class="relative flex items-center justify-center">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-700"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-dark-200 text-gray-400">其他登录方式</span>
+                </div>
+            </div>
+            
+            <div class="mt-6 grid grid-cols-3 gap-3">
+                <button class="social-btn">
+                    <i class="fa fa-weixin"></i>
+                </button>
+                <button class="social-btn">
+                    <i class="fa fa-qq"></i>
+                </button>
+                <button class="social-btn">
+                    <i class="fa fa-github"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-center text-sm text-gray-400">
+            <p>还没有账号？ <a href="#" class="text-primary hover:text-secondary transition-colors duration-300">立即注册</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // 切换密码可见性
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        });
+        
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取输入值
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // 简单验证
+            if (!username || !password) {
+                alert('请输入账号和密码');
+                return;
+            }
+            
+            // 跳转到index.html
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

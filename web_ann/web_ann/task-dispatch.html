@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任务下发 - 标注管理平台</title>
+<link href="https://static.mastergo.com/static/ai/resource/html/googleapis/css2" rel="stylesheet">
+<link href="https://static.mastergo.com/static/ai/resource/html/font-awesome/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+<script src="https://static.mastergo.com/static/ai/resource/html/tailwind/tailwind.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#333333',
+        secondary: '#e0e0e0',
+        background: '#f5f5f5',
+        card: '#f0f0f0',
+        muted: '#e0e0e0',
+        muted_foreground: '#555555',
+        border: 'rgba(0, 0, 0, 0.1)',
+        sidebar: '#e8e8e8',
+        sidebar_foreground: '#333333',
+        sidebar_primary: '#333333',
+        sidebar_primary_foreground: '#ffffff'
+      },
+      borderRadius: {
+        'none': '0px',
+        'sm': '2px',
+        DEFAULT: '4px',
+        'md': '8px',
+        'lg': '12px',
+        'xl': '16px',
+        '2xl': '20px',
+        '3xl': '24px',
+        'full': '9999px',
+        'button': '4px'
+      }
+    }
+  }
+}
+</script>
+<style>
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  min-height: 1024px;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+.sidebar {
+  width: 240px;
+  background-color: var(--sidebar);
+  color: var(--sidebar-foreground);
+}
+.main-content {
+  margin-left: 240px;
+  background-color: var(--background);
+}
+.card {
+  background-color: var(--card);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.table-row:hover {
+  background-color: var(--muted);
+}
+.status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.status-waiting {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+.status-processing {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+.status-completed {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.status-passed {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+.status-failed {
+  background-color: #fff1f0;
+  color: #f5222d;
+}
+i {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+}
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -500px;
+  width: 500px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+}
+.side-panel.open {
+  right: 0;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+.overlay.show {
+  display: block;
+}
+.checkbox-cell {
+  width: 40px;
+}
+.checkbox-cell input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.selected-count {
+  background-color: #1890ff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+</style>
+</head>
+<body class="flex">
+<!-- 左侧导航栏 -->
+<div class="sidebar fixed h-full text-sidebar_foreground">
+  <div class="p-4 border-b border-gray-300">
+    <div class="font-['Pacifico'] text-xl">logo</div>
+  </div>
+  <div class="mt-4">
+    <a href="./index.html" class="px-4 py-2 hover:bg-gray-200 cursor-pointer block">
+      <i class="fas fa-pen mr-2"></i>
+      <span>标注管理</span>
+    </a>
+    <div class="px-4 py-2 bg-sidebar_primary text-sidebar_primary_foreground cursor-pointer">
+      <i class="fas fa-check-circle mr-2"></i>
+      <span>任务下发</span>
+    </div>
+  </div>
+  <div class="absolute bottom-0 w-full p-4 border-t border-gray-300">
+    <div class="flex items-center">
+      <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center mr-2">
+        <i class="fas fa-user text-sm"></i>
+      </div>
+      <span>张伟</span>
+    </div>
+  </div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main-content flex-1 min-h-screen">
+  <!-- 顶部导航 -->
+  <div class="h-16 bg-card shadow-sm flex items-center justify-between px-6">
+    <div class="text-muted_foreground">
+      <i class="fas fa-home mr-2"></i>
+      <span>首页 / 任务下发</span>
+    </div>
+    <div class="flex items-center">
+      <i class="fas fa-bell text-muted_foreground mr-4 cursor-pointer"></i>
+      <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center cursor-pointer">
+        <i class="fas fa-user text-sm"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- 任务下发内容 -->
+  <div class="p-6">
+    <!-- 搜索区域 -->
+    <div class="card p-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">标注状态</label>
+          <select id="statusFilter" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <option value="">全部</option>
+            <option value="waiting">待标注</option>
+            <option value="processing">进行中</option>
+            <option value="completed">已标注</option>
+            <option value="passed">质检通过</option>
+            <option value="failed">质检失败</option>
+          </select>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">采集时间</label>
+          <div class="flex items-center space-x-2">
+            <input type="date" id="startDate" class="flex-1 pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <span class="text-muted_foreground">至</span>
+            <input type="date" id="endDate" class="flex-1 pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">数据集</label>
+          <select id="datasetFilter" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <option value="">全部</option>
+            <option value="dataset_a">数据集A</option>
+            <option value="dataset_b">数据集B</option>
+            <option value="dataset_c">数据集C</option>
+          </select>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">数据UUID</label>
+          <input type="text" id="uuidFilter" placeholder="请输入数据UUID" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button onclick="handleSearch()" class="bg-primary text-white px-6 py-2 rounded-button whitespace-nowrap hover:bg-gray-700">
+          <i class="fas fa-search mr-2"></i>
+          查询
+        </button>
+        <button onclick="handleReset()" class="ml-2 border border-border px-6 py-2 rounded-button whitespace-nowrap hover:bg-muted">
+          重置
+        </button>
+      </div>
+    </div>
+
+    <!-- 操作栏 -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center space-x-4">
+        <label class="flex items-center space-x-2 cursor-pointer">
+          <input type="checkbox" id="selectAll" onchange="handleSelectAll()" class="w-4 h-4">
+          <button class="text-sm text-muted_foreground">选择当前页</button>
+        </label>
+        <button onclick="handleSelectAllData()" class="text-sm text-blue-500 hover:text-blue-700 cursor-pointer">
+          选择全部数据
+        </button>
+        <span id="selectedInfo" class="text-sm text-muted_foreground hidden">
+          已选择 <span class="selected-count" id="selectedCount">0</span> 条数据
+        </span>
+      </div>
+      <div id="batchOperationDropdown" class="relative">
+        <button id="batchOperationButton" disabled class="bg-blue-500 text-white px-6 py-2 rounded-button whitespace-nowrap hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center">
+          <span>批量操作</span>
+          <i class="fas fa-chevron-down ml-2"></i>
+        </button>
+        <div id="batchOperationMenu" class="hidden absolute right-0 z-10 mt-1 bg-white border border-gray-200 rounded-md shadow-lg min-w-[120px]">
+          <div class="py-1">
+            <button onclick="openDispatchPanel()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+              标注下发
+            </button>
+            <button onclick="openQualityPanel()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+              质检下发
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据表格 -->
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-muted">
+            <tr>
+              <th class="checkbox-cell px-4 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">
+                <span class="sr-only">选择</span>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">UUID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">采集时间</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">数据集</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">标注状态</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable" class="bg-card divide-y divide-border">
+          </tbody>
+        </table>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-between border-t border-border">
+        <div class="text-sm text-muted_foreground">
+          显示 <span class="font-medium" id="showStart">1</span> 到 <span class="font-medium" id="showEnd">10</span> 条，共 <span class="font-medium" id="totalCount">0</span> 条记录
+        </div>
+        <div class="flex space-x-2" id="pagination">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 遮罩层 -->
+<div id="overlay" class="overlay"></div>
+
+<!-- 任务下发侧滑窗 -->
+<div id="dispatchPanel" class="side-panel">
+  <div class="h-full flex flex-col">
+    <!-- 头部 -->
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="text-lg font-medium text-gray-900">任务下发</h2>
+      <button onclick="closeDispatchPanel()" class="text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- 已选数据统计 -->
+      <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="text-sm text-blue-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          已选择 <span id="panelSelectedCount" class="font-medium">0</span> 条数据待下发
+        </div>
+      </div>
+
+      <!-- 分发方式 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">打包方式</label>
+        <div class="space-y-3">
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input type="radio" name="dispatchType" value="even" checked onchange="handleDispatchTypeChange()" class="w-4 h-4 text-blue-600">
+            <span class="text-sm text-gray-700">均匀分发</span>
+          </label>
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input type="radio" name="dispatchType" value="fixed" onchange="handleDispatchTypeChange()" class="w-4 h-4 text-blue-600">
+            <span class="text-sm text-gray-700">按固定量打包</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 固定大小输入（仅当选择固定大小时显示） -->
+      <div id="fixedSizeSection" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-2">每个数据包大小</label>
+        <input type="number" id="packageSize" value="20" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="calculatePackages()">
+        <p class="mt-2 text-xs text-gray-500">
+          将生成 <span id="packageCount" class="font-medium text-blue-600">0</span> 个数据包
+        </p>
+      </div>
+
+      <!-- 选择标注员或标注组 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">选择标注员或标注组</label>
+        
+        <!-- Tab 切换 -->
+        <div class="border-b border-gray-200 mb-4">
+          <div class="flex space-x-8">
+            <button onclick="switchTab('group')" id="groupTab" class="py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium">标注组</button>
+            <button onclick="switchTab('user')" id="userTab" class="py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">标注员</button>
+          </div>
+        </div>
+        
+        <!-- 标注组 Tab -->
+        <div id="groupContent" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">选择标注组</label>
+          <div id="groupDropdown" class="w-full">
+            <button id="groupDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+              <span id="groupSelectedText">请选择标注组</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="groupDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div class="p-2">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs text-gray-500">标注组列表</span>
+                  <button id="selectAllGroups" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="group_1" value="group_1" data-name="标注组A" data-count="5" class="group-checkbox mr-2">
+                    <span>标注组A (5人)</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="group_2" value="group_2" data-name="标注组B" data-count="3" class="group-checkbox mr-2">
+                    <span>标注组B (3人)</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="group_3" value="group_3" data-name="标注组C" data-count="4" class="group-checkbox mr-2">
+                    <span>标注组C (4人)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">可多选标注组</p>
+        </div>
+
+        <!-- 标注员 Tab -->
+        <div id="userContent" class="mb-4 hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2">选择标注员</label>
+          <div id="userDropdown" class="w-full">
+            <button id="userDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+              <span id="userSelectedText">请选择标注员</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="userDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div class="p-2">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs text-gray-500">标注员列表</span>
+                  <button id="selectAllUsers" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="user_1" value="user_1" data-name="张三" class="user-checkbox mr-2">
+                    <span>张三</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="user_2" value="user_2" data-name="李四" class="user-checkbox mr-2">
+                    <span>李四</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="user_3" value="user_3" data-name="王五" class="user-checkbox mr-2">
+                    <span>王五</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="user_4" value="user_4" data-name="赵六" class="user-checkbox mr-2">
+                    <span>赵六</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="user_5" value="user_5" data-name="钱七" class="user-checkbox mr-2">
+                    <span>钱七</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">可多选标注员</p>
+        </div>
+      </div>
+
+      <!-- 分发预览 -->
+      <div id="dispatchPreview" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-3">分发预览</label>
+        <div id="previewContent" class="border border-gray-200 rounded-lg p-4 max-h-60 overflow-y-auto text-sm">
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+      <button onclick="closeDispatchPanel()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50">
+        取消
+      </button>
+      <button onclick="handleDispatch()" id="confirmDispatchBtn" disabled class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+        确认下发
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 质检下发侧滑窗 -->
+<div id="qualityPanel" class="side-panel">
+  <div class="h-full flex flex-col">
+    <!-- 头部 -->
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="text-lg font-medium text-gray-900">质检下发</h2>
+      <button onclick="closeQualityPanel()" class="text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- 已选数据统计 -->
+      <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="text-sm text-blue-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          已选择 <span id="qualityPanelSelectedCount" class="font-medium">0</span> 条数据待质检
+        </div>
+      </div>
+
+      <!-- 分发方式 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">打包方式</label>
+        <div class="space-y-3">
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input type="radio" name="qualityDispatchType" value="even" checked onchange="handleQualityDispatchTypeChange()" class="w-4 h-4 text-blue-600">
+            <span class="text-sm text-gray-700">均匀分发</span>
+          </label>
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input type="radio" name="qualityDispatchType" value="fixed" onchange="handleQualityDispatchTypeChange()" class="w-4 h-4 text-blue-600">
+            <span class="text-sm text-gray-700">按固定量打包</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 固定大小输入（仅当选择固定大小时显示） -->
+      <div id="qualityFixedSizeSection" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-2">每个数据包大小</label>
+        <input type="number" id="qualityPackageSize" value="20" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="calculateQualityPackages()">
+        <p class="mt-2 text-xs text-gray-500">
+          将生成 <span id="qualityPackageCount" class="font-medium text-blue-600">0</span> 个数据包
+        </p>
+      </div>
+
+      <!-- 选择质检员或质检组 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">选择质检员或质检组</label>
+        
+        <!-- Tab 切换 -->
+        <div class="border-b border-gray-200 mb-4">
+          <div class="flex space-x-8">
+            <button onclick="switchQualityTab('qualityGroup')" id="qualityGroupTab" class="py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium">质检组</button>
+            <button onclick="switchQualityTab('qualityUser')" id="qualityUserTab" class="py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">质检员</button>
+          </div>
+        </div>
+        
+        <!-- 质检组 Tab -->
+        <div id="qualityGroupContent" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">选择质检组</label>
+          <div id="qualityGroupDropdown" class="w-full">
+            <button id="qualityGroupDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+              <span id="qualityGroupSelectedText">请选择质检组</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="qualityGroupDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div class="p-2">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs text-gray-500">质检组列表</span>
+                  <button id="selectAllQualityGroups" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="quality_group_1" value="quality_group_1" data-name="质检组A" data-count="3" class="quality-group-checkbox mr-2">
+                    <span>质检组A (3人)</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="quality_group_2" value="quality_group_2" data-name="质检组B" data-count="2" class="quality-group-checkbox mr-2">
+                    <span>质检组B (2人)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">可多选质检组</p>
+        </div>
+
+        <!-- 质检员 Tab -->
+        <div id="qualityUserContent" class="mb-4 hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2">选择质检员</label>
+          <div id="qualityUserDropdown" class="w-full">
+            <button id="qualityUserDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+              <span id="qualityUserSelectedText">请选择质检员</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="qualityUserDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div class="p-2">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs text-gray-500">质检员列表</span>
+                  <button id="selectAllQualityUsers" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="quality_user_1" value="quality_user_1" data-name="质检员1" class="quality-user-checkbox mr-2">
+                    <span>质检员1</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="quality_user_2" value="quality_user_2" data-name="质检员2" class="quality-user-checkbox mr-2">
+                    <span>质检员2</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="quality_user_3" value="quality_user_3" data-name="质检员3" class="quality-user-checkbox mr-2">
+                    <span>质检员3</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="quality_user_4" value="quality_user_4" data-name="质检员4" class="quality-user-checkbox mr-2">
+                    <span>质检员4</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">可多选质检员</p>
+        </div>
+      </div>
+
+      <!-- 分发预览 -->
+      <div id="qualityDispatchPreview" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-3">分发预览</label>
+        <div id="qualityPreviewContent" class="border border-gray-200 rounded-lg p-4 max-h-60 overflow-y-auto text-sm">
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+      <button onclick="closeQualityPanel()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50">
+        取消
+      </button>
+      <button onclick="handleQualityDispatch()" id="confirmQualityDispatchBtn" disabled class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+        确认下发
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 模拟数据
+const mockData = [
+  { id: 'uuid_001', collectTime: '2023-05-15', dataset: '数据集A', status: 'waiting' },
+  { id: 'uuid_002', collectTime: '2023-05-16', dataset: '数据集A', status: 'waiting' },
+  { id: 'uuid_003', collectTime: '2023-05-17', dataset: '数据集B', status: 'waiting' },
+  { id: 'uuid_004', collectTime: '2023-05-18', dataset: '数据集B', status: 'waiting' },
+  { id: 'uuid_005', collectTime: '2023-05-19', dataset: '数据集C', status: 'waiting' },
+  { id: 'uuid_006', collectTime: '2023-05-20', dataset: '数据集A', status: 'waiting' },
+  { id: 'uuid_007', collectTime: '2023-05-21', dataset: '数据集B', status: 'waiting' },
+  { id: 'uuid_008', collectTime: '2023-05-22', dataset: '数据集C', status: 'waiting' },
+  { id: 'uuid_009', collectTime: '2023-05-23', dataset: '数据集A', status: 'waiting' },
+  { id: 'uuid_010', collectTime: '2023-05-24', dataset: '数据集B', status: 'waiting' },
+  { id: 'uuid_011', collectTime: '2023-05-25', dataset: '数据集C', status: 'waiting' },
+  { id: 'uuid_012', collectTime: '2023-05-26', dataset: '数据集A', status: 'waiting' },
+  { id: 'uuid_013', collectTime: '2023-05-27', dataset: '数据集B', status: 'waiting' },
+  { id: 'uuid_014', collectTime: '2023-05-28', dataset: '数据集C', status: 'waiting' },
+  { id: 'uuid_015', collectTime: '2023-05-29', dataset: '数据集A', status: 'waiting' },
+];
+
+let filteredData = [...mockData];
+let selectedIds = new Set();
+let currentPage = 1;
+const pageSize = 10;
+
+// 状态映射
+const statusMap = {
+  'waiting': { text: '待标注', class: 'status-waiting' },
+  'processing': { text: '进行中', class: 'status-processing' },
+  'completed': { text: '已标注', class: 'status-completed' },
+  'passed': { text: '质检通过', class: 'status-passed' },
+  'failed': { text: '质检失败', class: 'status-failed' }
+};
+
+// 数据集映射
+const datasetMap = {
+  'dataset_a': '数据集A',
+  'dataset_b': '数据集B',
+  'dataset_c': '数据集C'
+};
+
+// 初始化
+function init() {
+  renderTable();
+  renderPagination();
+}
+
+// 渲染表格
+function renderTable() {
+  const tbody = document.getElementById('dataTable');
+  const start = (currentPage - 1) * pageSize;
+  const end = Math.min(start + pageSize, filteredData.length);
+  const pageData = filteredData.slice(start, end);
+
+  tbody.innerHTML = pageData.map(item => `
+    <tr class="table-row">
+      <td class="checkbox-cell px-4 py-4">
+        <input type="checkbox" 
+               class="row-checkbox" 
+               data-id="${item.id}" 
+               ${selectedIds.has(item.id) ? 'checked' : ''} 
+               onchange="handleRowSelect('${item.id}')">
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
+        ${item.id}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">${item.collectTime}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">${item.dataset}</td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="status-tag ${statusMap[item.status].class}">${statusMap[item.status].text}</span>
+      </td>
+    </tr>
+  `).join('');
+
+  // 更新统计信息
+  document.getElementById('showStart').textContent = filteredData.length > 0 ? start + 1 : 0;
+  document.getElementById('showEnd').textContent = end;
+  document.getElementById('totalCount').textContent = filteredData.length;
+
+  // 更新全选状态
+  updateSelectAllState();
+}
+
+// 渲染分页
+function renderPagination() {
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const pagination = document.getElementById('pagination');
+  
+  let html = '';
+  
+  // 上一页
+  html += `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1 border border-border rounded-button hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed">
+    <i class="fas fa-angle-left"></i>
+  </button>`;
+  
+  // 页码
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === currentPage) {
+      html += `<button class="px-3 py-1 bg-primary text-white rounded-button">${i}</button>`;
+    } else {
+      html += `<button onclick="goToPage(${i})" class="px-3 py-1 border border-border rounded-button hover:bg-muted">${i}</button>`;
+    }
+  }
+  
+  // 下一页
+  html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''} class="px-3 py-1 border border-border rounded-button hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed">
+    <i class="fas fa-angle-right"></i>
+  </button>`;
+  
+  pagination.innerHTML = html;
+}
+
+// 跳转页面
+function goToPage(page) {
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderTable();
+  renderPagination();
+}
+
+// 搜索
+function handleSearch() {
+  const status = document.getElementById('statusFilter').value;
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  const dataset = document.getElementById('datasetFilter').value;
+  const uuid = document.getElementById('uuidFilter').value.toLowerCase();
+
+  filteredData = mockData.filter(item => {
+    if (status && item.status !== status) return false;
+    if (startDate && item.collectTime < startDate) return false;
+    if (endDate && item.collectTime > endDate) return false;
+    if (dataset && datasetMap[dataset] !== item.dataset) return false;
+    if (uuid && !item.id.toLowerCase().includes(uuid)) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  selectedIds.clear();
+  updateSelectedInfo();
+  renderTable();
+  renderPagination();
+}
+
+// 重置
+function handleReset() {
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('startDate').value = '';
+  document.getElementById('endDate').value = '';
+  document.getElementById('datasetFilter').value = '';
+  document.getElementById('uuidFilter').value = '';
+  
+  filteredData = [...mockData];
+  currentPage = 1;
+  selectedIds.clear();
+  updateSelectedInfo();
+  renderTable();
+  renderPagination();
+}
+
+// 单行选择
+function handleRowSelect(id) {
+  if (selectedIds.has(id)) {
+    selectedIds.delete(id);
+  } else {
+    selectedIds.add(id);
+  }
+  updateSelectedInfo();
+  updateSelectAllState();
+}
+
+// 选择当前页
+function handleSelectAll() {
+  const selectAllCheckbox = document.getElementById('selectAll');
+  const start = (currentPage - 1) * pageSize;
+  const end = Math.min(start + pageSize, filteredData.length);
+  const pageData = filteredData.slice(start, end);
+
+  if (selectAllCheckbox.checked) {
+    pageData.forEach(item => selectedIds.add(item.id));
+  } else {
+    pageData.forEach(item => selectedIds.delete(item.id));
+  }
+
+  renderTable();
+  updateSelectedInfo();
+}
+
+// 选择全部数据
+function handleSelectAllData() {
+  if (filteredData.length === 0) {
+    alert('没有数据可选择');
+    return;
+  }
+  
+  // 选择所有过滤后的数据
+  filteredData.forEach(item => selectedIds.add(item.id));
+  
+  renderTable();
+  updateSelectedInfo();
+  alert(`已选择 ${filteredData.length} 条数据`);
+}
+
+// 更新选择当前页状态
+function updateSelectAllState() {
+  const selectAllCheckbox = document.getElementById('selectAll');
+  const start = (currentPage - 1) * pageSize;
+  const end = Math.min(start + pageSize, filteredData.length);
+  const pageData = filteredData.slice(start, end);
+
+  const allSelected = pageData.length > 0 && pageData.every(item => selectedIds.has(item.id));
+  selectAllCheckbox.checked = allSelected;
+}
+
+// 更新选中信息
+function updateSelectedInfo() {
+  const selectedInfo = document.getElementById('selectedInfo');
+  const selectedCount = document.getElementById('selectedCount');
+  const batchOperationButton = document.getElementById('batchOperationButton');
+
+  if (selectedIds.size > 0) {
+    selectedInfo.classList.remove('hidden');
+    selectedCount.textContent = selectedIds.size;
+    batchOperationButton.disabled = false;
+  } else {
+    selectedInfo.classList.add('hidden');
+    batchOperationButton.disabled = true;
+  }
+}
+
+// 打开下发面板
+function openDispatchPanel() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('dispatchPanel').classList.add('open');
+  document.getElementById('panelSelectedCount').textContent = selectedIds.size;
+  calculatePackages();
+}
+
+// 关闭下发面板
+function closeDispatchPanel() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('dispatchPanel').classList.remove('open');
+}
+
+// 打开质检下发面板
+function openQualityPanel() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('qualityPanel').classList.add('open');
+  document.getElementById('qualityPanelSelectedCount').textContent = selectedIds.size;
+  calculateQualityPackages();
+}
+
+// 关闭质检下发面板
+function closeQualityPanel() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('qualityPanel').classList.remove('open');
+}
+
+// 分发方式改变
+function handleDispatchTypeChange() {
+  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
+  const fixedSizeSection = document.getElementById('fixedSizeSection');
+  
+  if (dispatchType === 'fixed') {
+    fixedSizeSection.classList.remove('hidden');
+  } else {
+    fixedSizeSection.classList.add('hidden');
+  }
+  
+  calculatePackages();
+}
+
+// 计算数据包
+function calculatePackages() {
+  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
+  const packageSize = parseInt(document.getElementById('packageSize').value) || 1;
+  const totalItems = selectedIds.size;
+  
+  if (dispatchType === 'fixed') {
+    const packageCount = Math.ceil(totalItems / packageSize);
+    document.getElementById('packageCount').textContent = packageCount;
+  }
+  
+  updateDispatchPreview();
+}
+
+// 标注员选择改变
+function handleAnnotatorChange() {
+  updateDispatchPreview();
+}
+
+// 更新分发预览
+function updateDispatchPreview() {
+  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
+  const annotators = getSelectedAnnotators();
+  const previewSection = document.getElementById('dispatchPreview');
+  const previewContent = document.getElementById('previewContent');
+  const confirmBtn = document.getElementById('confirmDispatchBtn');
+  
+  if (annotators.length === 0) {
+    previewSection.classList.add('hidden');
+    confirmBtn.disabled = true;
+    return;
+  }
+  
+  previewSection.classList.remove('hidden');
+  confirmBtn.disabled = false;
+  
+  const totalItems = selectedIds.size;
+  const annotatorCount = annotators.length;
+  
+  let html = '';
+  
+  if (dispatchType === 'even') {
+    const itemsPerPerson = Math.floor(totalItems / annotatorCount);
+    const remainder = totalItems % annotatorCount;
+    
+    html = '<div class="space-y-2">';
+    annotators.forEach((annotator, index) => {
+      const count = itemsPerPerson + (index < remainder ? 1 : 0);
+      html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
+        <span class="text-gray-700">${annotator.name}</span>
+        <span class="text-blue-600 font-medium">${count} 条数据</span>
+      </div>`;
+    });
+    html += '</div>';
+  } else {
+    const packageSize = parseInt(document.getElementById('packageSize').value) || 1;
+    const packageCount = Math.ceil(totalItems / packageSize);
+    const packagesPerPerson = Math.floor(packageCount / annotatorCount);
+    const remainder = packageCount % annotatorCount;
+    
+    html = '<div class="space-y-2">';
+    html += `<div class="text-gray-500 mb-2">共 ${packageCount} 个数据包</div>`;
+    annotators.forEach((annotator, index) => {
+      const count = packagesPerPerson + (index < remainder ? 1 : 0);
+      html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
+        <span class="text-gray-700">${annotator.name}</span>
+        <span class="text-blue-600 font-medium">${count} 个数据包</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  
+  previewContent.innerHTML = html;
+}
+
+// Tab 切换
+function switchTab(tab) {
+  if (tab === 'group') {
+    document.getElementById('groupTab').classList.add('border-blue-500', 'text-blue-600');
+    document.getElementById('groupTab').classList.remove('border-transparent', 'text-gray-500');
+    document.getElementById('userTab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('userTab').classList.remove('border-blue-500', 'text-blue-600');
+    document.getElementById('groupContent').classList.remove('hidden');
+    document.getElementById('userContent').classList.add('hidden');
+  } else {
+    document.getElementById('userTab').classList.add('border-blue-500', 'text-blue-600');
+    document.getElementById('userTab').classList.remove('border-transparent', 'text-gray-500');
+    document.getElementById('groupTab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('groupTab').classList.remove('border-blue-500', 'text-blue-600');
+    document.getElementById('userContent').classList.remove('hidden');
+    document.getElementById('groupContent').classList.add('hidden');
+  }
+  handleAnnotatorChange();
+}
+
+
+
+// 确认下发
+function handleDispatch() {
+  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
+  const annotators = getSelectedAnnotators();
+  const totalItems = selectedIds.size;
+  
+  let message = '';
+  if (dispatchType === 'even') {
+    message = `已将 ${totalItems} 条数据均匀分发给 ${annotators.length} 个标注员/组`;
+  } else {
+    const packageSize = parseInt(document.getElementById('packageSize').value) || 1;
+    const packageCount = Math.ceil(totalItems / packageSize);
+    message = `已将 ${totalItems} 条数据打包成 ${packageCount} 个数据包，分发给 ${annotators.length} 个标注员/组`;
+  }
+  
+  alert(message);
+  closeDispatchPanel();
+  
+  // 清空选择
+  selectedIds.clear();
+  updateSelectedInfo();
+  renderTable();
+}
+
+// 质检分发方式改变
+function handleQualityDispatchTypeChange() {
+  const dispatchType = document.querySelector('input[name="qualityDispatchType"]:checked').value;
+  const fixedSizeSection = document.getElementById('qualityFixedSizeSection');
+  
+  if (dispatchType === 'fixed') {
+    fixedSizeSection.classList.remove('hidden');
+  } else {
+    fixedSizeSection.classList.add('hidden');
+  }
+  
+  calculateQualityPackages();
+}
+
+// 计算质检数据包
+function calculateQualityPackages() {
+  const dispatchType = document.querySelector('input[name="qualityDispatchType"]:checked').value;
+  const packageSize = parseInt(document.getElementById('qualityPackageSize').value) || 1;
+  const totalItems = selectedIds.size;
+  
+  if (dispatchType === 'fixed') {
+    const packageCount = Math.ceil(totalItems / packageSize);
+    document.getElementById('qualityPackageCount').textContent = packageCount;
+  }
+  
+  updateQualityDispatchPreview();
+}
+
+// 质检标注员选择改变
+function handleQualityAnnotatorChange() {
+  updateQualityDispatchPreview();
+}
+
+// 更新质检分发预览
+function updateQualityDispatchPreview() {
+  const dispatchType = document.querySelector('input[name="qualityDispatchType"]:checked').value;
+  const annotators = getSelectedQualityAnnotators();
+  const previewSection = document.getElementById('qualityDispatchPreview');
+  const previewContent = document.getElementById('qualityPreviewContent');
+  const confirmBtn = document.getElementById('confirmQualityDispatchBtn');
+  
+  if (annotators.length === 0) {
+    previewSection.classList.add('hidden');
+    confirmBtn.disabled = true;
+    return;
+  }
+  
+  previewSection.classList.remove('hidden');
+  confirmBtn.disabled = false;
+  
+  const totalItems = selectedIds.size;
+  const annotatorCount = annotators.length;
+  
+  let html = '';
+  
+  if (dispatchType === 'even') {
+    const itemsPerPerson = Math.floor(totalItems / annotatorCount);
+    const remainder = totalItems % annotatorCount;
+    
+    html = '<div class="space-y-2">';
+    annotators.forEach((annotator, index) => {
+      const count = itemsPerPerson + (index < remainder ? 1 : 0);
+      html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
+        <span class="text-gray-700">${annotator.name}</span>
+        <span class="text-blue-600 font-medium">${count} 条数据</span>
+      </div>`;
+    });
+    html += '</div>';
+  } else {
+    const packageSize = parseInt(document.getElementById('qualityPackageSize').value) || 1;
+    const packageCount = Math.ceil(totalItems / packageSize);
+    const packagesPerPerson = Math.floor(packageCount / annotatorCount);
+    const remainder = packageCount % annotatorCount;
+    
+    html = '<div class="space-y-2">';
+    html += `<div class="text-gray-500 mb-2">共 ${packageCount} 个数据包</div>`;
+    annotators.forEach((annotator, index) => {
+      const count = packagesPerPerson + (index < remainder ? 1 : 0);
+      html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
+        <span class="text-gray-700">${annotator.name}</span>
+        <span class="text-blue-600 font-medium">${count} 个数据包</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  
+  previewContent.innerHTML = html;
+}
+
+// 质检Tab 切换
+function switchQualityTab(tab) {
+  if (tab === 'qualityGroup') {
+    document.getElementById('qualityGroupTab').classList.add('border-blue-500', 'text-blue-600');
+    document.getElementById('qualityGroupTab').classList.remove('border-transparent', 'text-gray-500');
+    document.getElementById('qualityUserTab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('qualityUserTab').classList.remove('border-blue-500', 'text-blue-600');
+    document.getElementById('qualityGroupContent').classList.remove('hidden');
+    document.getElementById('qualityUserContent').classList.add('hidden');
+  } else {
+    document.getElementById('qualityUserTab').classList.add('border-blue-500', 'text-blue-600');
+    document.getElementById('qualityUserTab').classList.remove('border-transparent', 'text-gray-500');
+    document.getElementById('qualityGroupTab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('qualityGroupTab').classList.remove('border-blue-500', 'text-blue-600');
+    document.getElementById('qualityUserContent').classList.remove('hidden');
+    document.getElementById('qualityGroupContent').classList.add('hidden');
+  }
+  handleQualityAnnotatorChange();
+}
+
+// 确认质检下发
+function handleQualityDispatch() {
+  const dispatchType = document.querySelector('input[name="qualityDispatchType"]:checked').value;
+  const annotators = getSelectedQualityAnnotators();
+  const totalItems = selectedIds.size;
+  
+  let message = '';
+  if (dispatchType === 'even') {
+    message = `已将 ${totalItems} 条数据均匀分发给 ${annotators.length} 个质检员/组`;
+  } else {
+    const packageSize = parseInt(document.getElementById('qualityPackageSize').value) || 1;
+    const packageCount = Math.ceil(totalItems / packageSize);
+    message = `已将 ${totalItems} 条数据打包成 ${packageCount} 个数据包，分发给 ${annotators.length} 个质检员/组`;
+  }
+  
+  alert(message);
+  closeQualityPanel();
+  
+  // 清空选择
+  selectedIds.clear();
+  updateSelectedInfo();
+  renderTable();
+}
+
+// 获取选中的质检员
+function getSelectedQualityAnnotators() {
+  const annotators = [];
+  
+  // 获取选中的质检组
+  document.querySelectorAll('.quality-group-checkbox:checked').forEach(checkbox => {
+    annotators.push({
+      type: 'qualityGroup',
+      id: checkbox.value,
+      name: checkbox.dataset.name,
+      count: checkbox.dataset.count ? parseInt(checkbox.dataset.count) : 1
+    });
+  });
+  
+  // 获取选中的质检员
+  document.querySelectorAll('.quality-user-checkbox:checked').forEach(checkbox => {
+    annotators.push({
+      type: 'qualityUser',
+      id: checkbox.value,
+      name: checkbox.dataset.name,
+      count: 1
+    });
+  });
+  
+  return annotators;
+}
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+  init();
+  initDropdowns();
+});
+
+// 初始化下拉菜单
+function initDropdowns() {
+  // 批量操作下拉菜单
+  const batchOperationButton = document.getElementById('batchOperationButton');
+  const batchOperationMenu = document.getElementById('batchOperationMenu');
+  
+  batchOperationButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    batchOperationMenu.classList.toggle('hidden');
+  });
+  
+  // 标注组下拉菜单
+  const groupDropdownButton = document.getElementById('groupDropdownButton');
+  const groupDropdownMenu = document.getElementById('groupDropdownMenu');
+  
+  groupDropdownButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    groupDropdownMenu.classList.toggle('hidden');
+    document.getElementById('userDropdownMenu').classList.add('hidden');
+  });
+  
+  // 标注员下拉菜单
+  const userDropdownButton = document.getElementById('userDropdownButton');
+  const userDropdownMenu = document.getElementById('userDropdownMenu');
+  
+  userDropdownButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdownMenu.classList.toggle('hidden');
+    document.getElementById('groupDropdownMenu').classList.add('hidden');
+  });
+  
+  // 全选标注组
+  document.getElementById('selectAllGroups').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.group-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    updateGroupSelectedText();
+    handleAnnotatorChange();
+  });
+  
+  // 全选标注员
+  document.getElementById('selectAllUsers').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    updateUserSelectedText();
+    handleAnnotatorChange();
+  });
+  
+  // 标注组复选框变化
+  document.querySelectorAll('.group-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateGroupSelectedText();
+      handleAnnotatorChange();
+    });
+  });
+  
+  // 标注员复选框变化
+  document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateUserSelectedText();
+      handleAnnotatorChange();
+    });
+  });
+  
+  // 质检组下拉菜单
+  const qualityGroupDropdownButton = document.getElementById('qualityGroupDropdownButton');
+  const qualityGroupDropdownMenu = document.getElementById('qualityGroupDropdownMenu');
+  
+  qualityGroupDropdownButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    qualityGroupDropdownMenu.classList.toggle('hidden');
+    document.getElementById('qualityUserDropdownMenu').classList.add('hidden');
+  });
+  
+  // 质检员下拉菜单
+  const qualityUserDropdownButton = document.getElementById('qualityUserDropdownButton');
+  const qualityUserDropdownMenu = document.getElementById('qualityUserDropdownMenu');
+  
+  qualityUserDropdownButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    qualityUserDropdownMenu.classList.toggle('hidden');
+    document.getElementById('qualityGroupDropdownMenu').classList.add('hidden');
+  });
+  
+  // 全选质检组
+  document.getElementById('selectAllQualityGroups').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.quality-group-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    updateQualityGroupSelectedText();
+    handleQualityAnnotatorChange();
+  });
+  
+  // 全选质检员
+  document.getElementById('selectAllQualityUsers').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.quality-user-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    updateQualityUserSelectedText();
+    handleQualityAnnotatorChange();
+  });
+  
+  // 质检组复选框变化
+  document.querySelectorAll('.quality-group-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateQualityGroupSelectedText();
+      handleQualityAnnotatorChange();
+    });
+  });
+  
+  // 质检员复选框变化
+  document.querySelectorAll('.quality-user-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateQualityUserSelectedText();
+      handleQualityAnnotatorChange();
+    });
+  });
+  
+  // 点击其他区域关闭下拉菜单
+  document.addEventListener('click', function() {
+    batchOperationMenu.classList.add('hidden');
+    groupDropdownMenu.classList.add('hidden');
+    userDropdownMenu.classList.add('hidden');
+    qualityGroupDropdownMenu.classList.add('hidden');
+    qualityUserDropdownMenu.classList.add('hidden');
+  });
+  
+  // 阻止下拉菜单内点击事件冒泡
+  batchOperationMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  groupDropdownMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  userDropdownMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  qualityGroupDropdownMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  qualityUserDropdownMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+}
+
+// 更新质检组选择文本
+function updateQualityGroupSelectedText() {
+  const checkboxes = document.querySelectorAll('.quality-group-checkbox:checked');
+  const selectedCount = checkboxes.length;
+  const selectedText = document.getElementById('qualityGroupSelectedText');
+  
+  if (selectedCount === 0) {
+    selectedText.textContent = '请选择质检组';
+  } else if (selectedCount === 2) {
+    selectedText.textContent = '全部质检组';
+  } else {
+    selectedText.textContent = `已选择 ${selectedCount} 个质检组`;
+  }
+}
+
+// 更新质检员选择文本
+function updateQualityUserSelectedText() {
+  const checkboxes = document.querySelectorAll('.quality-user-checkbox:checked');
+  const selectedCount = checkboxes.length;
+  const selectedText = document.getElementById('qualityUserSelectedText');
+  
+  if (selectedCount === 0) {
+    selectedText.textContent = '请选择质检员';
+  } else if (selectedCount === 4) {
+    selectedText.textContent = '全部质检员';
+  } else {
+    selectedText.textContent = `已选择 ${selectedCount} 个质检员`;
+  }
+}
+
+// 更新标注组选择文本
+function updateGroupSelectedText() {
+  const checkboxes = document.querySelectorAll('.group-checkbox:checked');
+  const selectedCount = checkboxes.length;
+  const selectedText = document.getElementById('groupSelectedText');
+  
+  if (selectedCount === 0) {
+    selectedText.textContent = '请选择标注组';
+  } else if (selectedCount === 3) {
+    selectedText.textContent = '全部标注组';
+  } else {
+    selectedText.textContent = `已选择 ${selectedCount} 个标注组`;
+  }
+}
+
+// 更新标注员选择文本
+function updateUserSelectedText() {
+  const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+  const selectedCount = checkboxes.length;
+  const selectedText = document.getElementById('userSelectedText');
+  
+  if (selectedCount === 0) {
+    selectedText.textContent = '请选择标注员';
+  } else if (selectedCount === 5) {
+    selectedText.textContent = '全部标注员';
+  } else {
+    selectedText.textContent = `已选择 ${selectedCount} 个标注员`;
+  }
+}
+
+// 获取选中的标注员
+function getSelectedAnnotators() {
+  const annotators = [];
+  
+  // 获取选中的标注组
+  document.querySelectorAll('.group-checkbox:checked').forEach(checkbox => {
+    annotators.push({
+      type: 'group',
+      id: checkbox.value,
+      name: checkbox.dataset.name,
+      count: checkbox.dataset.count ? parseInt(checkbox.dataset.count) : 1
+    });
+  });
+  
+  // 获取选中的标注员
+  document.querySelectorAll('.user-checkbox:checked').forEach(checkbox => {
+    annotators.push({
+      type: 'user',
+      id: checkbox.value,
+      name: checkbox.dataset.name,
+      count: 1
+    });
+  });
+  
+  return annotators;
+}
+</script>
+</body>
+</html>
