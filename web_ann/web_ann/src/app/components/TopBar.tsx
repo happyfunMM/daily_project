@@ -61,6 +61,14 @@ export function TopBar({ fileInfo, currentFrame, onPrevFile, onNextFile, onSubmi
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onToggleQualityMode}
+          className={`bg-muted border-border hover:bg-accent text-foreground ${isQualityMode ? 'bg-blue-100 border-blue-300' : ''}`}
+        >
+          {isQualityMode ? '质检模式' : '标注模式'}
+        </Button>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -97,16 +105,6 @@ export function TopBar({ fileInfo, currentFrame, onPrevFile, onNextFile, onSubmi
         >
           <ChevronRight className="w-4 h-4" />
         </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onToggleQualityMode}
-          className={`bg-muted border-border hover:bg-accent text-foreground ${isQualityMode ? 'bg-blue-100 border-blue-300' : ''}`}
-        >
-          {isQualityMode ? '退出质检' : '质检模式'}
-        </Button>
-
         <Button
           variant="outline"
           size="sm"

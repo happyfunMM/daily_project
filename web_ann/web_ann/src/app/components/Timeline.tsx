@@ -182,10 +182,7 @@ export function Timeline({
                     className="absolute right-0 top-0 h-full w-1 bg-red-600 cursor-ew-resize hover:w-2 transition-all"
                     onMouseDown={(e) => handleSliceEdgeMouseDown(e, slice, 'end')}
                   />
-                  {/* Slice number */}
-                  <div className="absolute top-1 left-2">
-                    <span className="text-xs text-white font-medium">s{index}</span>
-                  </div>
+
                 </div>
               </div>
             );
@@ -245,20 +242,18 @@ export function Timeline({
         </div>
 
         {/* Slice Labels */}
-        <div className="mt-1 text-xs mb-1">
-          <div className="flex flex-wrap gap-2">
-            {sortedSlices.map((slice, index) => (
-              <span 
-                key={slice.id} 
-                className="cursor-pointer text-muted-foreground hover:text-blue-500"
-                onClick={() => onFrameChange(slice.start)}
-              >
-                s{index}: {slice.level1} - {slice.level2}
-                {index < sortedSlices.length - 1 && <span className="mx-1">, </span>}
+        {selectedSlice && (
+          <div className="mt-1 text-xs mb-1">
+            <div className="flex flex-wrap gap-2">
+              <span className="text-foreground font-medium">
+                当前选中: {selectedSlice.level1} - {selectedSlice.level2}
               </span>
-            ))}
+              <span className="text-muted-foreground">
+                帧范围: {selectedSlice.start} - {selectedSlice.end}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Playback Controls */}

@@ -324,7 +324,18 @@ function App() {
       s.id === sliceId ? { ...s, qualityStatus: status } : s
     ));
     
-    const statusText = status === 'passed' ? '通过' : status === 'failed' ? '不通过' : '待质检';
+    let statusText = '待质检';
+    switch (status) {
+      case 'passed':
+        statusText = '通过';
+        break;
+      case 'failed_rescan':
+        statusText = '不通过：重标';
+        break;
+      case 'failed_discard':
+        statusText = '不通过：丢弃';
+        break;
+    }
     toast.success(`切片质检状态已更新为：${statusText}`);
   };
 
@@ -336,9 +347,15 @@ function App() {
     }
   };
 
-  const handleQualityFail = () => {
+  const handleQualityFailRescan = () => {
     if (selectedSlice) {
-      handleQualityUpdate(selectedSlice.id, 'failed');
+      handleQualityUpdate(selectedSlice.id, 'failed_rescan');
+    }
+  };
+
+  const handleQualityFailDiscard = () => {
+    if (selectedSlice) {
+      handleQualityUpdate(selectedSlice.id, 'failed_discard');
     }
   };
 
@@ -362,15 +379,6 @@ function App() {
 
         {/* Main Content Area */}
         <div className="flex-1 flex overflow-hidden relative">
-          {/* Quality Sidebar */}
-          {isQualityMode && (
-            <QualitySidebar
-              slices={slices}
-              selectedSlice={selectedSlice}
-              onSliceClick={handleSliceClick}
-            />
-          )}
-          
           {/* BVH Viewer */}
           <div className="flex-1 p-4 relative">
             <div className="w-full h-full relative">
@@ -420,7 +428,8 @@ function App() {
             canUseLabel={canUseLabel}
             isQualityMode={isQualityMode}
             onQualityPass={handleQualityPass}
-            onQualityFail={handleQualityFail}
+            onQualityFailRescan={handleQualityFailRescan}
+            onQualityFailDiscard={handleQualityFailDiscard}
             selectedSlice={selectedSlice}
           />
         </div>

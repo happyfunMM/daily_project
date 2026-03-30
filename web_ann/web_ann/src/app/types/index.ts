@@ -1,5 +1,5 @@
 export type DataType = 'A' | 'B' | 'C';
-export type QualityStatus = 'pending' | 'passed' | 'failed';
+export type QualityStatus = 'pending' | 'passed' | 'failed' | 'failed_rescan' | 'failed_discard';
 export type ToolType = 'select' | 'slice' | 'label' | 'quality';
 
 export interface Slice {

@@ -11,8 +11,10 @@ const getStatusIcon = (status: string) => {
   switch (status) {
     case 'passed':
       return <CheckCircle className="w-4 h-4 text-green-500" />;
-    case 'failed':
+    case 'failed_rescan':
       return <XCircle className="w-4 h-4 text-red-500" />;
+    case 'failed_discard':
+      return <XCircle className="w-4 h-4 text-gray-500" />;
     default:
       return <Clock className="w-4 h-4 text-yellow-500" />;
   }
@@ -22,8 +24,10 @@ const getStatusText = (status: string) => {
   switch (status) {
     case 'passed':
       return '通过';
-    case 'failed':
-      return '不通过';
+    case 'failed_rescan':
+      return '不通过：重标';
+    case 'failed_discard':
+      return '不通过：丢弃';
     default:
       return '待质检';
   }

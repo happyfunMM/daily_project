@@ -15,11 +15,12 @@ interface FloatingToolbarProps {
   canUseLabel: boolean;
   isQualityMode?: boolean;
   onQualityPass?: () => void;
-  onQualityFail?: () => void;
+  onQualityFailRescan?: () => void;
+  onQualityFailDiscard?: () => void;
   selectedSlice?: any;
 }
 
-export function FloatingToolbar({ activeTool, onToolChange, canUseLabel, isQualityMode, onQualityPass, onQualityFail, selectedSlice }: FloatingToolbarProps) {
+export function FloatingToolbar({ activeTool, onToolChange, canUseLabel, isQualityMode, onQualityPass, onQualityFailRescan, onQualityFailDiscard, selectedSlice }: FloatingToolbarProps) {
   return (
     <div className="absolute right-4 top-1/2 -translate-y-1/2 z-20">
       <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-2xl p-2 flex flex-col gap-2">
@@ -77,13 +78,13 @@ export function FloatingToolbar({ activeTool, onToolChange, canUseLabel, isQuali
                       <Button
                         size="sm"
                         onClick={onQualityPass}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 text-xs"
                       >
-                        <CheckCircle className="w-4 h-4" />
+                        通过
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left">
-                      <p>质检通过</p>
+                      <p>通过</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -91,14 +92,29 @@ export function FloatingToolbar({ activeTool, onToolChange, canUseLabel, isQuali
                     <TooltipTrigger asChild>
                       <Button
                         size="sm"
-                        onClick={onQualityFail}
-                        className="bg-red-600 hover:bg-red-700"
+                        onClick={onQualityFailRescan}
+                        className="bg-red-600 hover:bg-red-700 text-xs"
                       >
-                        <XCircle className="w-4 h-4" />
+                        不通过-重标
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left">
-                      <p>质检不通过</p>
+                      <p>不通过：重标</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        onClick={onQualityFailDiscard}
+                        className="bg-gray-600 hover:bg-gray-700 text-xs"
+                      >
+                        不通过-丢弃
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>不通过：丢弃</p>
                     </TooltipContent>
                   </Tooltip>
                 </>
