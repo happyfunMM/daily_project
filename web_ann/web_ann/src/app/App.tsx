@@ -66,6 +66,7 @@ function App() {
     failedSlices: 0,
     pendingSlices: 0,
   });
+  const [currentQualityStatus, setCurrentQualityStatus] = useState<QualityStatus | null>(null);
 
   // Playback loop
   useEffect(() => {
@@ -117,66 +118,76 @@ function App() {
   const handleSliceClick = (slice: Slice) => {
     setSelectedSlice(slice);
     setCurrentFrame(slice.start);
-    setActiveTool('slice');
+    if (!isQualityMode) {
+      setActiveTool('slice');
+    }
   };
 
   const handleEditSlice = (slice: Slice) => {
-    setSelectedSlice(slice);
-    setEditingSlice(slice);
+    if (!isQualityMode) {
+      setSelectedSlice(slice);
+      setEditingSlice(slice);
+    }
   };
 
   const handleSliceDelete = (sliceId: string) => {
-    setSlices((prev) => prev.filter((s) => s.id !== sliceId));
-    if (selectedSlice?.id === sliceId) {
-      setSelectedSlice(null);
+    if (!isQualityMode) {
+      setSlices((prev) => prev.filter((s) => s.id !== sliceId));
+      if (selectedSlice?.id === sliceId) {
+        setSelectedSlice(null);
+      }
+      if (pendingSlice?.id === sliceId) {
+        setPendingSlice(null);
+        setPendingSliceStart(null);
+      }
+      toast.success('切片已删除');
     }
-    if (pendingSlice?.id === sliceId) {
-      setPendingSlice(null);
-      setPendingSliceStart(null);
-    }
-    toast.success('切片已删除');
   };
 
   const handleSliceUpdate = (updatedSlice: Slice) => {
-    setSlices((prev) =>
-      prev.map((s) => (s.id === updatedSlice.id ? updatedSlice : s))
-    );
-    if (selectedSlice?.id === updatedSlice.id) {
-      setSelectedSlice(updatedSlice);
+    if (!isQualityMode) {
+      setSlices((prev) =>
+        prev.map((s) => (s.id === updatedSlice.id ? updatedSlice : s))
+      );
+      if (selectedSlice?.id === updatedSlice.id) {
+        setSelectedSlice(updatedSlice);
+      }
     }
   };
 
   // Handle slice point click from timeline (when slice tool is active)
   const handleSlicePointClick = useCallback((frame: number) => {
-    if (pendingSliceStart === null) {
-      // First click: set start point
-      setPendingSliceStart(frame);
-      toast.info('已插入起始点，请点击设置结束点');
-    } else {
-      // Second click: set end point and create pending slice
-      const start = Math.min(pendingSliceStart, frame);
-      const end = Math.max(pendingSliceStart, frame);
-      
-      if (end - start < 1) {
-        toast.error('切片长度太短，请重新选择');
-        setPendingSliceStart(null);
-        return;
-      }
+    if (!isQualityMode) {
+      if (pendingSliceStart === null) {
+        // First click: set start point
+        setPendingSliceStart(frame);
+        toast.info('已插入起始点，请点击设置结束点');
+      } else {
+        // Second click: set end point and create pending slice
+        const start = Math.min(pendingSliceStart, frame);
+        const end = Math.max(pendingSliceStart, frame);
+        
+        if (end - start < 1) {
+          toast.error('切片长度太短，请重新选择');
+          setPendingSliceStart(null);
+          return;
+        }
 
-      const newSlice: Slice = {
-        id: `slice-${Date.now()}`,
-        start,
-        end,
-        level1: '',
-        level2: '',
-      };
-      
-      setPendingSlice(newSlice);
-      setEditingSlice(newSlice);
-      // 不清除 pendingSliceStart，保留开始点的绿色竖线
-      toast.success('已插入结束点，请填写切片信息');
+        const newSlice: Slice = {
+          id: `slice-${Date.now()}`,
+          start,
+          end,
+          level1: '',
+          level2: '',
+        };
+        
+        setPendingSlice(newSlice);
+        setEditingSlice(newSlice);
+        // 不清除 pendingSliceStart，保留开始点的绿色竖线
+        toast.success('已插入结束点，请填写切片信息');
+      }
     }
-  }, [pendingSliceStart]);
+  }, [pendingSliceStart, isQualityMode]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -324,6 +335,9 @@ function App() {
       s.id === sliceId ? { ...s, qualityStatus: status } : s
     ));
     
+    // Update current quality status for TopBar display
+    setCurrentQualityStatus(status);
+    
     let statusText = '待质检';
     switch (status) {
       case 'passed':
@@ -344,18 +358,33 @@ function App() {
   const handleQualityPass = () => {
     if (selectedSlice) {
       handleQualityUpdate(selectedSlice.id, 'passed');
+    } else {
+      // 应用到所有切片
+      setSlices((prev) => prev.map((s) => ({ ...s, qualityStatus: 'passed' })));
+      setCurrentQualityStatus('passed');
+      toast.success('所有切片质检状态已更新为：通过');
     }
   };
 
-  const handleQualityFailRescan = () => {
+  const handleQualityFailRescan = (reason: string) => {
     if (selectedSlice) {
       handleQualityUpdate(selectedSlice.id, 'failed_rescan');
+    } else {
+      // 应用到所有切片
+      setSlices((prev) => prev.map((s) => ({ ...s, qualityStatus: 'failed_rescan' })));
+      setCurrentQualityStatus('failed_rescan');
+      toast.success(`所有切片质检状态已更新为：不通过：重标（原因：${reason}）`);
     }
   };
 
-  const handleQualityFailDiscard = () => {
+  const handleQualityFailDiscard = (reason: string) => {
     if (selectedSlice) {
       handleQualityUpdate(selectedSlice.id, 'failed_discard');
+    } else {
+      // 应用到所有切片
+      setSlices((prev) => prev.map((s) => ({ ...s, qualityStatus: 'failed_discard' })));
+      setCurrentQualityStatus('failed_discard');
+      toast.success(`所有切片质检状态已更新为：不通过：丢弃（原因：${reason}）`);
     }
   };
 
@@ -372,9 +401,14 @@ function App() {
           onNextFile={handleNextFile}
           onSubmit={handleSubmit}
           onShowShortcuts={() => setShowShortcuts(true)}
+          onSkipAnnotation={(reason: string) => {
+            toast.info(`数据已跳过，原因：${reason}`);
+            // 这里可以添加实际的跳过数据逻辑
+          }}
           qualityResult={qualityResult}
           isQualityMode={isQualityMode}
           onToggleQualityMode={() => setIsQualityMode((prev) => !prev)}
+          currentQualityStatus={currentQualityStatus}
         />
 
         {/* Main Content Area */}
@@ -453,10 +487,11 @@ function App() {
           onSliceUpdate={handleSliceUpdate}
           onSlicePointClick={handleSlicePointClick}
           selectedSlice={selectedSlice}
+          isQualityMode={isQualityMode}
         />
 
         {/* Annotation Form */}
-        {editingSlice && (
+        {editingSlice && !isQualityMode && (
           <div className="bg-card border-t border-border p-2 h-[5vh] min-h-[40px] flex items-center">
             <div className="flex-1 flex items-center gap-4">
               <h3 className="text-xs font-min text-foreground">编辑切片</h3>

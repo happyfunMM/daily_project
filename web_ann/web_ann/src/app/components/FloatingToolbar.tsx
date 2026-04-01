@@ -1,11 +1,13 @@
 import { MousePointer2, Scissors, Tag, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
+import { useState } from 'react';
 
 export type ToolType = 'select' | 'slice' | 'label' | 'quality';
 
@@ -15,12 +17,49 @@ interface FloatingToolbarProps {
   canUseLabel: boolean;
   isQualityMode?: boolean;
   onQualityPass?: () => void;
-  onQualityFailRescan?: () => void;
-  onQualityFailDiscard?: () => void;
+  onQualityFailRescan?: (reason: string) => void;
+  onQualityFailDiscard?: (reason: string) => void;
   selectedSlice?: any;
 }
 
 export function FloatingToolbar({ activeTool, onToolChange, canUseLabel, isQualityMode, onQualityPass, onQualityFailRescan, onQualityFailDiscard, selectedSlice }: FloatingToolbarProps) {
+  const [showRescanInput, setShowRescanInput] = useState(false);
+  const [showDiscardInput, setShowDiscardInput] = useState(false);
+  const [rescanReason, setRescanReason] = useState('');
+  const [discardReason, setDiscardReason] = useState('');
+
+  const handleRescanClick = () => {
+    if (showRescanInput && rescanReason.trim() && onQualityFailRescan) {
+      onQualityFailRescan(rescanReason.trim());
+      setRescanReason('');
+      setShowRescanInput(false);
+    } else {
+      setShowRescanInput(true);
+      setShowDiscardInput(false);
+    }
+  };
+
+  const handleDiscardClick = () => {
+    if (showDiscardInput && discardReason.trim() && onQualityFailDiscard) {
+      onQualityFailDiscard(discardReason.trim());
+      setDiscardReason('');
+      setShowDiscardInput(false);
+    } else {
+      setShowDiscardInput(true);
+      setShowRescanInput(false);
+    }
+  };
+
+  const handleRescanCancel = () => {
+    setShowRescanInput(false);
+    setRescanReason('');
+  };
+
+  const handleDiscardCancel = () => {
+    setShowDiscardInput(false);
+    setDiscardReason('');
+  };
+
   return (
     <div className="absolute right-4 top-1/2 -translate-y-1/2 z-20">
       <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-2xl p-2 flex flex-col gap-2">
@@ -71,54 +110,94 @@ export function FloatingToolbar({ activeTool, onToolChange, canUseLabel, isQuali
 
           {isQualityMode && (
             <>
-              {selectedSlice && (
-                <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="sm"
-                        onClick={onQualityPass}
-                        className="bg-green-600 hover:bg-green-700 text-xs"
-                      >
-                        通过
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left">
-                      <p>通过</p>
-                    </TooltipContent>
-                  </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    onClick={onQualityPass}
+                    className="bg-green-600 hover:bg-green-700 text-xs"
+                  >
+                    通过
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  <p>通过</p>
+                </TooltipContent>
+              </Tooltip>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="sm"
-                        onClick={onQualityFailRescan}
-                        className="bg-red-600 hover:bg-red-700 text-xs"
-                      >
-                        不通过-重标
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left">
-                      <p>不通过：重标</p>
-                    </TooltipContent>
-                  </Tooltip>
+              <div className="relative">
+                {showRescanInput && (
+                  <div className="absolute right-full top-0 mr-1 flex items-center gap-1 bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-2xl p-2 z-50 whitespace-nowrap">
+                    <Input
+                      type="text"
+                      placeholder="请输入原因"
+                      value={rescanReason}
+                      onChange={(e) => setRescanReason(e.target.value)}
+                      className="w-28 h-7 text-xs"
+                      autoFocus
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRescanCancel}
+                      className="h-7 px-1 text-xs"
+                    >
+                      取消
+                    </Button>
+                  </div>
+                )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      onClick={handleRescanClick}
+                      className="bg-red-600 hover:bg-red-700 text-xs whitespace-nowrap"
+                    >
+                      {showRescanInput ? '确认' : '不通过-重标'}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>不通过：重标</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="sm"
-                        onClick={onQualityFailDiscard}
-                        className="bg-gray-600 hover:bg-gray-700 text-xs"
-                      >
-                        不通过-丢弃
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left">
-                      <p>不通过：丢弃</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </>
-              )}
+              <div className="relative">
+                {showDiscardInput && (
+                  <div className="absolute right-full top-0 mr-1 flex items-center gap-1 bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-2xl p-2 z-50 whitespace-nowrap">
+                    <Input
+                      type="text"
+                      placeholder="请输入原因"
+                      value={discardReason}
+                      onChange={(e) => setDiscardReason(e.target.value)}
+                      className="w-28 h-7 text-xs"
+                      autoFocus
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleDiscardCancel}
+                      className="h-7 px-1 text-xs"
+                    >
+                      取消
+                    </Button>
+                  </div>
+                )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      onClick={handleDiscardClick}
+                      className="bg-gray-600 hover:bg-gray-700 text-xs whitespace-nowrap"
+                    >
+                      {showDiscardInput ? '确认' : '不通过-丢弃'}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>不通过：丢弃</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </>
           )}
         </TooltipProvider>

@@ -23,6 +23,7 @@ interface TimelineProps {
   onSlicePointClick: (frame: number) => void;
   selectedSlice: Slice | null;
   pendingSlice: Slice | null;
+  isQualityMode?: boolean;
 }
 
 export function Timeline({
@@ -43,6 +44,7 @@ export function Timeline({
   onSlicePointClick,
   selectedSlice,
   pendingSlice,
+  isQualityMode,
 }: TimelineProps) {
   const timelineRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -124,7 +126,7 @@ export function Timeline({
       <div className="flex-1 px-4 pt-2">
         <div className="mb-1 flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
-            时间轴 {activeTool === 'slice' && <span className="text-green-500">- 切片模式: 按 S 键插入开始/结束点</span>}
+            时间轴 {activeTool === 'slice' && !isQualityMode && <span className="text-green-500">- 切片模式: 按 S 键插入开始/结束点</span>}
           </span>
           <span className="text-xs text-muted-foreground">
             {Math.floor(currentFrame / 30 / 60)}:{String(Math.floor((currentFrame / 30) % 60)).padStart(2, '0')}

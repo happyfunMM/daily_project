@@ -1,12 +1,14 @@
 import { Info, Keyboard, ChevronLeft, ChevronRight, Send } from 'lucide-react';
 import { Button } from './ui/button';
-import { FileInfo } from '../types';
+import { Input } from './ui/input';
+import { FileInfo, QualityStatus } from '../types';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
+import { useState } from 'react';
 
 import { QualityResult } from '../types';
 
@@ -17,13 +19,58 @@ interface TopBarProps {
   onNextFile: () => void;
   onSubmit: () => void;
   onShowShortcuts: () => void;
-  onSkipAnnotation: () => void;
+  onSkipAnnotation: (reason: string) => void;
   qualityResult?: QualityResult;
   isQualityMode?: boolean;
   onToggleQualityMode: () => void;
+  currentQualityStatus?: QualityStatus | null;
 }
 
-export function TopBar({ fileInfo, currentFrame, onPrevFile, onNextFile, onSubmit, onShowShortcuts, onSkipAnnotation, qualityResult, isQualityMode, onToggleQualityMode }: TopBarProps) {
+export function TopBar({ fileInfo, currentFrame, onPrevFile, onNextFile, onSubmit, onShowShortcuts, onSkipAnnotation, qualityResult, isQualityMode, onToggleQualityMode, currentQualityStatus }: TopBarProps) {
+  const [showSkipInput, setShowSkipInput] = useState(false);
+  const [skipReason, setSkipReason] = useState('');
+
+  const getStatusText = (status: QualityStatus | null) => {
+    switch (status) {
+      case 'passed':
+        return '通过';
+      case 'failed_rescan':
+        return '不通过：重标';
+      case 'failed_discard':
+        return '不通过：丢弃';
+      default:
+        return '待质检';
+    }
+  };
+
+  const getStatusColor = (status: QualityStatus | null) => {
+    switch (status) {
+      case 'passed':
+        return 'text-green-500';
+      case 'failed_rescan':
+        return 'text-red-500';
+      case 'failed_discard':
+        return 'text-gray-500';
+      default:
+        return 'text-yellow-500';
+    }
+  };
+
+  const handleSkipClick = () => {
+    if (showSkipInput && skipReason.trim()) {
+      onSkipAnnotation(skipReason.trim());
+      setSkipReason('');
+      setShowSkipInput(false);
+    } else {
+      setShowSkipInput(true);
+    }
+  };
+
+  const handleSkipCancel = () => {
+    setShowSkipInput(false);
+    setSkipReason('');
+  };
+
   return (
     <div className="h-[5vh] min-h-[50px] bg-card border-b border-border flex items-center justify-between px-6">
       {/* Left: File Info */}
@@ -38,14 +85,14 @@ export function TopBar({ fileInfo, currentFrame, onPrevFile, onNextFile, onSubmi
           <span className="text-muted-foreground">Duration:</span>{' '}
           <span className="font-medium">{fileInfo.duration}</span>
         </span>
-        {isQualityMode && qualityResult && (
+        {isQualityMode && (
           <>
             <span className="text-muted-foreground">|</span>
             <span className="text-sm">
-              <span className="text-muted-foreground">质检:</span>{' '}
-              <span className="font-medium text-green-500">{qualityResult.passedSlices}</span>/
-              <span className="font-medium text-red-500">{qualityResult.failedSlices}</span>/
-              <span className="font-medium text-yellow-500">{qualityResult.pendingSlices}</span>
+              <span className="text-muted-foreground">质检状态:</span>{' '}
+              <span className={`font-medium ${getStatusColor(currentQualityStatus)}`}>
+                {getStatusText(currentQualityStatus)}
+              </span>
             </span>
           </>
         )}
@@ -105,14 +152,38 @@ export function TopBar({ fileInfo, currentFrame, onPrevFile, onNextFile, onSubmi
         >
           <ChevronRight className="w-4 h-4" />
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onSkipAnnotation}
-          className="bg-muted border-border hover:bg-accent text-foreground"
-        >
-          跳过标注
-        </Button>
+        {!isQualityMode && (
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSkipClick}
+              className="bg-muted border-border hover:bg-accent text-foreground"
+            >
+              {showSkipInput ? '确认跳过' : '跳过标注'}
+            </Button>
+            {showSkipInput && (
+              <div className="absolute top-full right-0 mt-1 flex items-center gap-1 bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-2xl p-2 z-50">
+                <Input
+                  type="text"
+                  placeholder="请输入跳过原因"
+                  value={skipReason}
+                  onChange={(e) => setSkipReason(e.target.value)}
+                  className="w-40 h-7 text-xs"
+                  autoFocus
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSkipCancel}
+                  className="h-7 px-2 text-xs"
+                >
+                  取消
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         <Button
           size="sm"
