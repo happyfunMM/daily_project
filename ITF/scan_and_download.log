@@ -1,0 +1,39 @@
+2026-05-11 15:35:18,054 - INFO - 创建挂载点: C:\Users\chopi\AppData\Local\Temp\smb_mount_nxhy3bln
+2026-05-11 15:35:18,894 - ERROR - 挂载失败: 此命令的语法是:
+
+NET USE
+[devicename | *] [\\computername\sharename[\volume] [password | *]]
+        [/USER:[domainname\]username]
+        [/USER:[dotted domain name\]username]
+        [/USER:[username@dotted domain name]
+        [/SMARTCARD]
+        [/SAVECRED]
+        [/REQUIREINTEGRITY]
+        [/REQUIREPRIVACY]
+        [/WRITETHROUGH]
+        [/TCPPORT:{0-65535}]
+        [/QUICPORT:{0-65535}]
+        [/RDMAPORT:{0-65535}]
+        [/TRANSPORT:{TCP | QUIC} [/SKIPCERTCHECK]]
+        [/REQUESTCOMPRESSION:{YES | NO}]
+        [/BLOCKNTLM]
+        [/GLOBAL]
+        [[/DELETE] [/GLOBAL]]]
+
+NET USE {devicename | *} [password | *] /HOME
+
+NET USE [/PERSISTENT:{YES | NO}]
+
+
+2026-05-11 15:55:09,689 - INFO - 使用驱动器盘符: W:
+2026-05-11 15:55:11,863 - ERROR - 挂载失败: 发生系统错误 1219。
+
+不允许一个用户使用一个以上用户名与服务器或共享资源的多重连接。中断与此服务器或共享资源的所有连接，然后再试一次。
+
+
+2026-05-11 15:56:35,183 - INFO - 使用驱动器盘符: V:
+2026-05-11 15:56:37,287 - ERROR - 挂载失败: 发生系统错误 1219。
+
+不允许一个用户使用一个以上用户名与服务器或共享资源的多重连接。中断与此服务器或共享资源的所有连接，然后再试一次。
+
+
