@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>数据标注平台</title>
+<title>MWV切割平台</title>
 <link href="https://static.mastergo.com/static/ai/resource/html/googleapis/css2" rel="stylesheet">
 <link href="https://static.mastergo.com/static/ai/resource/html/font-awesome/css/all.min.css" rel="stylesheet">
 <script src="https://static.mastergo.com/static/ai/resource/html/tailwind/tailwind.js"></script>
@@ -19,9 +19,9 @@ tailwind.config = {
         muted: '#e0e0e0',
         muted_foreground: '#555555',
         border: 'rgba(0, 0, 0, 0.1)',
-        sidebar: '#e8e8e8',
-        sidebar_foreground: '#333333',
-        sidebar_primary: '#333333',
+        sidebar: '#000000',
+        sidebar_foreground: '#ffffff',
+        sidebar_primary: '#000000',
         sidebar_primary_foreground: '#ffffff'
       },
       borderRadius: {
@@ -41,20 +41,90 @@ tailwind.config = {
 }
 </script>
 <style>
+:root {
+  --background: #f5f5f5;
+  --foreground: #333333;
+  --sidebar: #000000;
+  --sidebar-foreground: #ffffff;
+  --card: #f0f0f0;
+  --muted: #e0e0e0;
+}
 body {
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  min-height: 1024px;
+  min-height: 100vh;
   background-color: var(--background);
   color: var(--foreground);
+  overflow-x: auto;
 }
 .sidebar {
   width: 240px;
   background-color: var(--sidebar);
   color: var(--sidebar-foreground);
+  top: 0;
+  left: 0;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  position: fixed;
+}
+
+.sidebar.collapsed {
+  width: 64px;
+}
+
+.sidebar.collapsed span {
+  display: none;
+}
+
+.collapse-btn {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 48px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.collapse-btn:hover {
+  background-color: #444;
 }
 .main-content {
   margin-left: 240px;
   background-color: var(--background);
+  padding-top: 0;
+  min-height: 100vh;
+  overflow-x: auto;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 64px;
+  }
+  .sidebar span {
+    display: none;
+  }
+  .main-content {
+    margin-left: 64px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    width: 0;
+    overflow: hidden;
+  }
+  .main-content {
+    margin-left: 0;
+  }
 }
 .card {
   background-color: var(--card);
@@ -64,17 +134,17 @@ body {
 .table-row:hover {
   background-color: var(--muted);
 }
-.status-tag {
+.status-tag, .cut-status-tag {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 10px;
   font-size: 12px;
 }
-.status-waiting {
+.status-waiting, .cut-status-pending {
   background-color: #fff7e6;
   color: #fa8c16;
 }
-.status-processing {
+.status-processing, .cut-status-initial {
   background-color: #e6f7ff;
   color: #1890ff;
 }
@@ -82,13 +152,50 @@ body {
   background-color: #f6ffed;
   color: #52c41a;
 }
-.status-passed {
+.status-passed, .cut-status-passed {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.status-failed, .cut-status-failed {
+  background-color: #fff1f0;
+  color: #f5222d;
+}
+.status-review-pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+.status-review-passed {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.status-review-rejected {
+  background-color: #fff1f0;
+  color: #f5222d;
+}
+.status-final-passed {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.status-final-rejected {
+  background-color: #fff1f0;
+  color: #f5222d;
+}
+.status-final-pending {
   background-color: #e6f7ff;
   color: #1890ff;
 }
-.status-failed {
-  background-color: #fff1f0;
-  color: #f5222d;
+.editable-input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: white;
+}
+.editable-input:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 i {
   display: flex;
@@ -97,56 +204,164 @@ i {
   width: 16px;
   height: 16px;
 }
+.checkbox-cell {
+  width: 40px;
+}
+.checkbox-cell input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.selected-count {
+  background-color: #1890ff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -500px;
+  width: 500px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+}
+.side-panel.open {
+  right: 0;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+.overlay.show {
+  display: block;
+}
+
+/* 表格响应式 */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.table-container table {
+  min-width: 800px;
+  width: 100%;
+}
+
+/* 搜索区域响应式 */
+@media (max-width: 1024px) {
+  .search-row {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+  
+  .p-6 {
+    padding: 1rem;
+  }
+  
+  .px-6 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .text-sm {
+    font-size: 0.75rem;
+  }
+  
+  .py-4 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .px-4 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* 模态框响应式 */
+@media (max-width: 640px) {
+  .side-panel {
+    width: 100%;
+    right: -100%;
+  }
+  
+  .side-panel.open {
+    right: 0;
+  }
+}
+
+/* 按钮响应式 */
+@media (max-width: 640px) {
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+}
 </style>
 </head>
-<body class="flex">
+<body class="flex min-h-screen">
 <!-- 左侧导航栏 -->
-<div class="sidebar fixed h-full text-sidebar_foreground">
-  <div class="p-4 border-b border-gray-300">
-    <div class="font-['Pacifico'] text-xl">logo</div>
+<div class="sidebar h-full bg-black text-white">
+  <button class="collapse-btn" onclick="toggleSidebar()">
+    &lt;
+  </button>
+  <div class="h-16 flex items-center justify-center">
+    <img src="20260508-144337.jpg" alt="NR DATA MANAGER" class="h-full w-auto object-cover">
   </div>
   <div class="mt-4">
-    <div class="px-4 py-2 bg-sidebar_primary text-sidebar_primary_foreground cursor-pointer">
+    <div id="navMWV" class="px-4 py-2 text-blue-400 cursor-pointer flex items-center">
       <i class="fas fa-pen mr-2"></i>
-      <span>数据标注</span>
+      <span>MWV切割</span>
     </div>
-    <!-- <a href="./task-dispatch.html" class="px-4 py-2 hover:bg-gray-200 cursor-pointer block">
+    <div id="navQuality" class="px-4 py-2 text-white hover:text-blue-400 cursor-pointer block flex items-center">
       <i class="fas fa-check-circle mr-2"></i>
-      <span>任务下发</span>
-    </a> -->
-  </div>
-  <div class="absolute bottom-0 w-full p-4 border-t border-gray-300">
-    <div class="flex items-center">
-      <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center mr-2">
-        <i class="fas fa-user text-sm"></i>
-      </div>
-      <span>张伟</span>
+      <span>数据质检</span>
     </div>
   </div>
 </div>
 <!-- 主内容区 -->
 <div class="main-content flex-1 min-h-screen">
   <!-- 顶部导航 -->
-  <div class="h-16 bg-card shadow-sm flex items-center justify-between px-6">
-    <div class="text-muted_foreground">
+  <div class="h-16 bg-black shadow-sm flex items-center justify-between px-6">
+    <div class="text-white">
       <i class="fas fa-home mr-2"></i>
-      <span>首页 / 数据标注</span>
+      <span>首页 / MWV切割</span>
     </div>
     <div class="flex items-center">
-      <i class="fas fa-bell text-muted_foreground mr-4 cursor-pointer"></i>
-      <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center cursor-pointer">
-        <i class="fas fa-user text-sm"></i>
+      <i class="fas fa-bell text-white mr-4 cursor-pointer"></i>
+      <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center cursor-pointer">
+        <i class="fas fa-user text-white text-sm"></i>
       </div>
     </div>
   </div>
-  <!-- 数据标注内容 -->
-  <div class="p-6">
+  <!-- MWV切割内容 -->
+  <div id="contentMWV" class="p-6">
     <!-- 搜索区域 -->
     <div class="card p-4 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <!-- 第一行：状态和日期 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div class="relative">
-          <label class="block text-sm font-medium text-muted_foreground mb-1">数据状态</label>
-          <select class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">切割状态</label>
+          <select id="statusFilter" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
             <option value="">全部</option>
             <option value="waiting">待标注</option>
             <option value="processing">进行中</option>
@@ -156,106 +371,211 @@ i {
           </select>
         </div>
         <div class="relative">
-          <label class="block text-sm font-medium text-muted_foreground mb-1">标注日期</label>
+          <label class="block text-sm font-medium text-muted_foreground mb-1">提交日期</label>
           <div class="flex items-center space-x-2">
-            <input type="date" class="flex-1 pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <input type="date" id="startDate" class="flex-1 pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
             <span class="text-muted_foreground">至</span>
-            <input type="date" class="flex-1 pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <input type="date" id="endDate" class="flex-1 pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
           </div>
         </div>
+      </div>
+      
+      <!-- 第二行：批次ID和UUID -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div class="relative">
-          <label class="block text-sm font-medium text-muted_foreground mb-1">标注人</label>
-          <input type="text" placeholder="请输入标注人" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">批次ID</label>
+          <input type="text" id="batchIdFilter" placeholder="请输入批次ID" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
         </div>
         <div class="relative">
           <label class="block text-sm font-medium text-muted_foreground mb-1">数据UUID</label>
-          <input type="text" placeholder="请输入数据UUID" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          <input type="text" id="uuidFilter" placeholder="请输入数据UUID" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+      </div>
+      
+      <!-- 第三行：其他筛选条件 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">席位</label>
+          <select id="seatFilter" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <option value="">全部</option>
+            <option value="seat1">seat1</option>
+            <option value="seat2">seat2</option>
+            <option value="seat3">seat3</option>
+          </select>
+        </div>
+         <div class="relative">
+   <label class="block text-sm font-medium text-muted_foreground mb-1">数据类型</label>
+   <select id="dataTypeFilter" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+     <option value="">I类</option>
+     <option value="II">II类</option>
+     <option value="III">III类</option>
+     <option value="IV">IV类</option>
+   </select>
+ </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">切割员</label>
+          <input type="text" id="cutterFilter" placeholder="请搜索切割员" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">初审员</label>
+          <input type="text" id="reviewerFilter" placeholder="请搜索初审员" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
         </div>
       </div>
       <div class="flex justify-end">
-        <button class="bg-primary text-white px-6 py-2 rounded-button whitespace-nowrap hover:bg-gray-700">
+        <button onclick="handleSearch()" class="bg-primary text-white px-6 py-2 rounded-button whitespace-nowrap hover:bg-gray-700">
           <i class="fas fa-search mr-2"></i>
           查询
         </button>
-        <button class="ml-2 border border-border px-6 py-2 rounded-button whitespace-nowrap hover:bg-muted">
+        <button onclick="handleReset()" class="ml-2 border border-border px-6 py-2 rounded-button whitespace-nowrap hover:bg-muted">
           重置
         </button>
       </div>
     </div>
+
+    <!-- 操作栏 -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center space-x-4">
+        <label class="flex items-center space-x-2 cursor-pointer">
+          <input type="checkbox" id="selectAll" onchange="handleSelectAll()" class="w-4 h-4">
+          <span class="text-sm text-muted_foreground">选择当前页</span>
+        </label>
+        <button onclick="handleSelectAllData()" class="text-sm text-blue-500 hover:text-blue-700 cursor-pointer">
+          选择全部数据
+        </button>
+        <span id="selectedInfo" class="text-sm text-muted_foreground hidden">
+          已选择 <span class="selected-count" id="selectedCount">0</span> 条数据
+        </span>
+      </div>
+      <div id="batchOperationDropdown" class="relative">
+        <button id="batchOperationButton" disabled class="bg-blue-500 text-white px-6 py-2 rounded-button whitespace-nowrap hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center">
+          <span>批量操作</span>
+          <i class="fas fa-chevron-down ml-2"></i>
+        </button>
+        <div id="batchOperationMenu" class="hidden absolute right-0 z-10 mt-1 bg-white border border-gray-200 rounded-md shadow-lg min-w-[120px]">
+          <div class="py-1">
+            <button onclick="openDispatchPanel()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+              数据切割分配
+            </button>
+            <button onclick="openQualityPanel()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+              初审下发
+            </button>
+            <button onclick="openRandomInspectionPanel()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+              随机抽检
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 数据表格 -->
     <div class="card overflow-hidden">
-      <div class="overflow-x-auto">
+      <div class="table-container">
         <table class="w-full">
           <thead class="bg-muted">
             <tr>
+              <th class="checkbox-cell px-4 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">
+                <span class="sr-only">选择</span>
+              </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">UUID</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">标注日期</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">状态</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">batchID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">席位</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">切割状态</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">切割员</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">提交时间</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">操作</th>
             </tr>
           </thead>
-          <tbody class="bg-card divide-y divide-border">
-            <tr class="table-row">
+          <tbody id="dataTable" class="bg-card divide-y divide-border">
+            <tr class="table-row" data-id="1" data-batch-id="B1699912800000001">
+              <td class="checkbox-cell px-4 py-4">
+                <input type="checkbox" class="row-checkbox" onchange="handleRowSelect(this)">
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
-                <a href="#" class="text-primary hover:underline">4329jskfhskelv0</a>
+                <a href="#" class="text-primary hover:underline">4a3f2d1e0c9b8a7e</a>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-05-15</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">B1699912800000001</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">seat1</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="status-tag status-completed">已标注</span>
+                <span class="status-tag status-completed">待审核</span>
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">jt@example.com</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:20:00</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
                 <a href="./app.html" class="text-primary hover:text-gray-700">标注</a>
               </td>
             </tr>
-            <tr class="table-row">
+            <tr class="table-row" data-id="2" data-batch-id="">
+              <td class="checkbox-cell px-4 py-4">
+                <input type="checkbox" class="row-checkbox" onchange="handleRowSelect(this)">
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
-                <a href="#" class="text-primary hover:underline">4flskhjfgaod00</a>
+                <a href="#" class="text-primary hover:underline">0b4c5d6e7f8a9b0c</a>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-05-16</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground"></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">seat2</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="status-tag status-processing">进行中</span>
+                <span class="status-tag status-processing">初始</span>
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground"></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground"></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
                 <a href="./app.html" class="text-primary hover:text-gray-700">标注</a>
               </td>
             </tr>
-            <tr class="table-row">
+            <tr class="table-row" data-id="3" data-batch-id="">
+              <td class="checkbox-cell px-4 py-4">
+                <input type="checkbox" class="row-checkbox" onchange="handleRowSelect(this)">
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
-                <a href="#" class="text-primary hover:underline">4fjhgooiwhs0</a>
+                <a href="#" class="text-primary hover:underline">4c5d6e7f8a9b0c1d</a>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-05-17</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground"></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">seat1</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="status-tag status-waiting">待标注</span>
+                <span class="status-tag status-waiting">初始</span>
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground"></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground"></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
                 <a href="./app.html" class="text-primary hover:text-gray-700">标注</a>
               </td>
             </tr>
-            <tr class="table-row">
+            <tr class="table-row" data-id="4" data-batch-id="B1699912860000002">
+              <td class="checkbox-cell px-4 py-4">
+                <input type="checkbox" class="row-checkbox" onchange="handleRowSelect(this)">
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
-                <a href="#" class="text-primary hover:underline">4mcnbvnmmf0ss</a>
+                <a href="#" class="text-primary hover:underline">0d6e7f8a9b0c1d2e</a>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-05-18</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">B1699912860000002</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">seat3</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="status-tag status-passed">质检通过</span>
+                <span class="status-tag status-passed">初审通过</span>
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">qq@example.com</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:35:00</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
                 <a href="./app.html" class="text-primary hover:text-gray-700">标注</a>
               </td>
             </tr>
-            <tr class="table-row">
+            <tr class="table-row" data-id="5" data-batch-id="B1699912920000003">
+              <td class="checkbox-cell px-4 py-4">
+                <input type="checkbox" class="row-checkbox" onchange="handleRowSelect(this)">
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
-                <a href="#" class="text-primary hover:underline">413slfjhwovisi02</a>
+                <a href="#" class="text-primary hover:underline">4e7f8a9b0c1d2e3f</a>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-05-19</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">B1699912920000003</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">seat2</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="status-tag status-failed">质检失败</span>
+                <span class="status-tag status-failed">初审拒绝</span>
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">lim@example.com</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:42:00</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
                 <a href="./app.html" class="text-primary hover:text-gray-700">标注</a>
                 <span class="mx-1">|</span>
-                <a href="/re-annotation-page" class="text-primary hover:text-blue-600">重标注</a>
-
+                <a href="/re-annotation-page" class="text-primary hover:text-blue-600">修改</a>
               </td>
             </tr>
           </tbody>
@@ -263,9 +583,9 @@ i {
       </div>
       <div class="px-6 py-4 flex items-center justify-between border-t border-border">
         <div class="text-sm text-muted_foreground">
-          显示 <span class="font-medium">1</span> 到 <span class="font-medium">5</span> 条，共 <span class="font-medium">23</span> 条记录
+          显示 <span class="font-medium" id="showStart">1</span> 到 <span class="font-medium" id="showEnd">5</span> 条，共 <span class="font-medium" id="totalCount">5</span> 条记录
         </div>
-        <div class="flex space-x-2">
+        <div class="flex space-x-2" id="pagination">
           <button class="px-3 py-1 border border-border rounded-button hover:bg-muted">
             <i class="fas fa-angle-left"></i>
           </button>
@@ -279,6 +599,2175 @@ i {
       </div>
     </div>
   </div>
+  
+  <!-- 数据质检内容 -->
+  <div id="contentQuality" class="p-6 hidden">
+    <!-- 检索区域 -->
+    <div class="card p-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">批次ID</label>
+          <input type="text" id="qualityBatchId" placeholder="请输入批次ID" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">创建时间</label>
+          <input type="date" id="qualityCreateTime" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">切割员</label>
+          <input type="text" id="qualityCutter" placeholder="请输入切割员" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">初审人</label>
+          <input type="text" id="qualityReviewer" placeholder="请输入初审人" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">终审人</label>
+          <input type="text" id="qualityFinalReviewer" placeholder="请输入终审人" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">批次状态</label>
+          <select id="qualityBatchStatus" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">--</option>
+            <option value="待初审">待初审</option>
+            <option value="待终审">待终审</option>
+            <option value="终审通过">终审通过</option>
+            <option value="终审拒绝">终审拒绝</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button id="qualitySearchBtn" class="px-4 py-2 bg-primary text-white rounded-button hover:bg-blue-600">检索</button>
+      </div>
+    </div>
+    
+    <!-- 批次列表 -->
+    <div class="card p-4">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">批次列表</h2>
+      <div class="table-container">
+        <table class="w-full">
+          <thead class="bg-muted">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">批次ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">批次数据量</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">状态统计</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">切割员</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">初审人</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">终审人</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">批次状态</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">操作</th>
+            </tr>
+          </thead>
+          <tbody id="qualityTaskTable" class="bg-card divide-y divide-border">
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">B1699912800000001</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">50</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <span class="status-tag status-review-pending">待审核</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">jt@example.com</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <input type="text" class="editable-input" placeholder="请输入初审人账号" value="">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <input type="text" class="editable-input" placeholder="请输入终审人账号" value="">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-final-pending">待终审</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="#" onclick="showQualityDetail('B1699912800000001')" class="text-primary hover:text-gray-700">查看</a>
+              </td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">B1699912860000002</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">80</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <span class="status-tag status-review-passed">初审通过</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">lisi@example.com</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <input type="text" class="editable-input" placeholder="请输入初审人账号" value="">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <input type="text" class="editable-input" placeholder="请输入终审人账号" value="">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-final-passed">终审通过</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="#" onclick="showQualityDetail('B1699912860000002')" class="text-primary hover:text-gray-700">查看</a>
+              </td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">B1699912920000003</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">60</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <span class="status-tag status-review-rejected">初审拒绝</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">xiaoan@example.com</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <input type="text" class="editable-input" placeholder="请输入初审人账号" value="">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <input type="text" class="editable-input" placeholder="请输入终审人账号" value="">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-final-rejected">终审拒绝</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="#" onclick="showQualityDetail('B1699912920000003')" class="text-primary hover:text-gray-700">查看</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-between border-t border-border">
+        <div class="text-sm text-muted_foreground">
+          显示 <span class="font-medium" id="qualityShowStart">1</span> 到 <span class="font-medium" id="qualityShowEnd">3</span> 条，共 <span class="font-medium" id="qualityTotalCount">3</span> 条记录
+        </div>
+        <div class="flex space-x-2" id="qualityPagination">
+          <button class="px-3 py-1 border border-border rounded-button hover:bg-muted">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          <button class="px-3 py-1 bg-primary text-white rounded-button">1</button>
+          <button class="px-3 py-1 border border-border rounded-button hover:bg-muted">
+            <i class="fas fa-angle-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 批次详情内容 -->
+  <div id="contentQualityDetail" class="p-6 hidden">
+    <!-- 返回按钮和抽检按钮 -->
+    <div class="flex items-center justify-between mb-6">
+      <button onclick="goBackToQualityList()" class="flex items-center text-primary hover:text-blue-600">
+        <i class="fas fa-arrow-left mr-2"></i>
+        返回
+      </button>
+      <button id="samplingConfigBtn" class="flex items-center px-4 py-2 bg-green-600 text-white rounded-button hover:bg-green-700">
+        <i class="fas fa-random mr-2"></i>
+        抽检配置
+      </button>
+    </div>
+    
+    <!-- 当前批次信息 -->
+    <div class="card p-4 mb-6">
+      <div class="flex flex-wrap gap-6">
+        <div>
+          <span class="text-sm text-muted_foreground">批次ID：</span>
+          <span id="detailBatchId" class="font-medium"></span>
+        </div>
+        <div>
+          <span class="text-sm text-muted_foreground">切割员：</span>
+          <span id="detailCutter" class="font-medium"></span>
+        </div>
+        <div>
+          <span class="text-sm text-muted_foreground">初审人：</span>
+          <span id="detailReviewer" class="font-medium"></span>
+        </div>
+        <div>
+          <span class="text-sm text-muted_foreground">终审人：</span>
+          <span id="detailFinalReviewer" class="font-medium"></span>
+        </div>
+        <div>
+          <span class="text-sm text-muted_foreground">终审状态：</span>
+          <span id="detailFinalStatus" class="font-medium"></span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 检索区域 -->
+    <div class="card p-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">UUID</label>
+          <input type="text" id="detailUuid" placeholder="请输入UUID" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">数据类型</label>
+          <select id="detailDataType" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">全部</option>
+            <option value="I类">I类</option>
+            <option value="II类">II类</option>
+            <option value="III类">III类</option>
+            <option value="IV类">IV类</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">最新修改日期</label>
+          <input type="date" id="detailModifyTime" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">切割状态</label>
+          <select id="detailCutStatus" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">全部</option>
+            <option value="初始">初始</option>
+            <option value="待审核">待审核</option>
+            <option value="初审通过">初审通过</option>
+            <option value="初审拒绝">初审拒绝</option>
+            <option value="终审人工通过">终审人工通过</option>
+            <option value="终审自动通过">终审自动通过</option>
+            <option value="终审人工拒绝">终审人工拒绝</option>
+            <option value="终审自动拒绝">终审自动拒绝</option>
+            <option value="终审暂存">终审暂存</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button id="detailSearchBtn" class="px-4 py-2 bg-primary text-white rounded-button hover:bg-blue-600">检索</button>
+        </div>
+        <div class="flex items-center ml-4">
+          <label class="flex items-center cursor-pointer">
+            <input type="checkbox" id="detailSamplingOnly" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" disabled>
+            <span class="ml-2 text-sm text-gray-500">只看抽检</span>
+          </label>
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button id="detailBatchApproveBtn" class="px-4 py-2 bg-green-500 text-white rounded-button hover:bg-green-600 mr-2">批量通过</button>
+        <button id="detailBatchRejectBtn" class="px-4 py-2 bg-red-500 text-white rounded-button hover:bg-red-600">批量拒绝</button>
+      </div>
+    </div>
+    
+    <!-- 数据列表 -->
+    <div class="card p-4">
+      <div class="table-container">
+        <table class="w-full">
+          <thead class="bg-muted">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">UUID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">最新修改日期</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">切割状态</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">操作</th>
+            </tr>
+          </thead>
+          <tbody id="detailDataTable" class="bg-card divide-y divide-border">
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
+                <a href="#" class="text-primary hover:underline">4a3f2d1e0c9b8a7e</a>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:20:00</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-processing">待审核</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="./app.html" class="text-primary hover:text-gray-700">审核</a>
+              </td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
+                <a href="#" class="text-primary hover:underline">0b4c5d6e7f8a9b0c</a>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:25:00</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-passed">初审通过</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="./app.html" class="text-primary hover:text-gray-700">审核</a>
+              </td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
+                <a href="#" class="text-primary hover:underline">4c5d6e7f8a9b0c1d</a>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:31:00</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-failed">初审拒绝</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="./app.html" class="text-primary hover:text-gray-700">审核</a>
+              </td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
+                <a href="#" class="text-primary hover:underline">0d6e7f8a9b0c1d2e</a>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:35:00</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-final-passed">终审人工通过</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="./app.html" class="text-primary hover:text-gray-700">审核</a>
+              </td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
+                <a href="#" class="text-primary hover:underline">4e7f8a9b0c1d2e3f</a>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">2023-11-13 14:42:00</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="status-tag status-final-rejected">终审人工拒绝</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+                <a href="./app.html" class="text-primary hover:text-gray-700">审核</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-between border-t border-border">
+        <div class="text-sm text-muted_foreground">
+          显示 <span class="font-medium" id="detailShowStart">1</span> 到 <span class="font-medium" id="detailShowEnd">5</span> 条，共 <span class="font-medium" id="detailTotalCount">5</span> 条记录
+        </div>
+        <div class="flex space-x-2" id="detailPagination">
+          <button class="px-3 py-1 border border-border rounded-button hover:bg-muted">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          <button class="px-3 py-1 bg-primary text-white rounded-button">1</button>
+          <button class="px-3 py-1 border border-border rounded-button hover:bg-muted">
+            <i class="fas fa-angle-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- 遮罩层 -->
+<div id="overlay" class="overlay"></div>
+
+<!-- 数据切割分配侧滑窗 -->
+<div id="dispatchPanel" class="side-panel">
+  <div class="h-full flex flex-col">
+    <!-- 头部 -->
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="text-lg font-medium text-gray-900">数据切割分配</h2>
+      <button onclick="closeDispatchPanel()" class="text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <!-- 内容区 -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- 已选数据统计 -->
+      <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="text-sm text-blue-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          已选择 <span id="panelSelectedCount" class="font-medium">0</span> 条数据待下发
+        </div>
+      </div>
+      <!-- 选择切割员 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">选择切割员</label>
+        <div class="w-full relative">
+          <input type="text" id="userSearchInput" placeholder="搜索标注员..." class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <div id="userDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-button shadow-lg">
+            <div class="border-t border-gray-200">
+              <div class="p-2 border-b border-gray-200 flex justify-between items-center">
+                <span class="text-xs text-gray-500">标注员列表</span>
+                <button id="selectAllUsers" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+              </div>
+              <div id="userListContainer" class="max-h-48 overflow-y-auto">
+               <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_1" data-user-name="张三">
+                 <span>jutingting</span>
+                 <i class="fas fa-check text-blue-500 hidden"></i>
+               </div>
+               <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_2" data-user-name="李四">
+                 <span>lisi</span>
+                 <i class="fas fa-check text-blue-500 hidden"></i>
+               </div>
+               <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_3" data-user-name="王五">
+                 <span>xiaoan</span>
+                 <i class="fas fa-check text-blue-500 hidden"></i>
+               </div>
+               <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_4" data-user-name="赵六">
+                 <span>qianqiqi</span>
+                 <i class="fas fa-check text-blue-500 hidden"></i>
+               </div>
+               <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_5" data-user-name="钱七">
+                 <span>liming</span>
+                 <i class="fas fa-check text-blue-500 hidden"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs text-gray-500">点击搜索框展开标注员列表</p>
+      </div>
+      <!-- 所选标注员名单预览 -->
+      <div id="selectedAnnotatorsPreview" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-3">所选标注员名单</label>
+        <div id="selectedAnnotatorsList" class="border border-gray-200 rounded-lg p-3 max-h-32 overflow-y-auto text-sm bg-gray-50">
+        </div>
+      </div>
+      <!-- 自动计算提示 -->
+      <div id="dispatchStats" class="mb-6 p-4 bg-green-50 rounded-lg hidden">
+        <div class="text-sm text-green-700 space-y-1">
+          <div>数据总量：<span id="statsTotal" class="font-medium">0</span> 条</div>
+          <div>已选标注员：<span id="statsAnnotatorCount" class="font-medium">0</span> 人</div>
+          <div>每人平均标注量：<span id="statsAverage" class="font-medium">0</span> 条</div>
+          <div class="mt-2 text-xs">数据将均匀下发</div>
+        </div>
+      </div>
+      <!-- 分发预览 -->
+      <div id="dispatchPreview" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-3">分发预览</label>
+        <div id="previewContent" class="border border-gray-200 rounded-lg p-4 max-h-60 overflow-y-auto text-sm">
+        </div>
+      </div>
+    </div>
+    <!-- 底部按钮 -->
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+      <button onclick="closeDispatchPanel()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50">
+        取消
+      </button>
+      <button onclick="handleDispatch()" id="confirmDispatchBtn" disabled class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+        确认下发
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 初审下发侧滑窗 -->
+<div id="qualityPanel" class="side-panel">
+  <div class="h-full flex flex-col">
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="text-lg font-medium text-gray-900">初审下发</h2>
+      <button onclick="closeQualityPanel()" class="text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6">
+      <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="text-sm text-blue-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          已选择 <span id="qualityPanelSelectedCount" class="font-medium">0</span> 条数据待质检
+        </div>
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">任务名</label>
+        <input type="text" id="qualityTaskName" placeholder="例如：I类数据初次质检" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <p class="mt-2 text-xs text-gray-500">
+          描述这个质检任务的数据是什么
+        </p>
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">选择质检员</label>
+        <input type="text" id="qualityUserSearchInput" placeholder="搜索质检员..." class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+      <button onclick="closeQualityPanel()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50">
+        取消
+      </button>
+      <button onclick="handleQualityDispatch()" id="confirmQualityBtn" disabled class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+        确认下发
+      </button>
+    </div>
+  </div>
+</div>
+<!-- 随机抽检侧滑窗 -->
+<div id="randomInspectionPanel" class="side-panel">
+  <div class="h-full flex flex-col">
+    <!-- 头部 -->
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="text-lg font-medium text-gray-900">随机抽检</h2>
+      <button onclick="closeRandomInspectionPanel()" class="text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- 已选数据统计 -->
+      <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="text-sm text-blue-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          已选择 <span id="randomInspectionPanelSelectedCount" class="font-medium">0</span> 条数据待抽检
+        </div>
+      </div>
+
+      <!-- 任务名 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">任务名</label>
+        <input type="text" id="inspectionTaskName" placeholder="例如：I类数据第一批次抽检验收" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <p class="mt-2 text-xs text-gray-500">
+          描述这个抽检任务的数据是什么
+        </p>
+      </div>
+
+      <!-- 抽检方式选择 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">抽检方式</label>
+        <div class="flex space-x-6">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="radio" name="inspectionMode" id="inspectionModeRatio" value="ratio" checked class="text-blue-500 focus:ring-blue-500">
+            <span class="text-sm text-gray-700">按比例</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="radio" name="inspectionMode" id="inspectionModeCount" value="count" class="text-blue-500 focus:ring-blue-500">
+            <span class="text-sm text-gray-700">按数量</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 抽检比例 -->
+      <div id="inspectionRatioSection" class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">抽检比例</label>
+        <div class="relative">
+          <input type="number" id="inspectionRatio" value="10" min="1" max="100" class="w-full pr-12 px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+        </div>
+        <p class="mt-2 text-xs text-gray-500">
+          将从选中数据中随机抽取 <span id="inspectionCount" class="font-medium text-blue-600">0</span> 条数据（约占 <span id="inspectionPercent" class="font-medium text-blue-600">0</span>%）
+        </p>
+      </div>
+
+      <!-- 抽检数量 -->
+      <div id="inspectionCountSection" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-2">抽检数量</label>
+        <div class="relative">
+          <input type="number" id="inspectionFixedCount" value="10" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">条</span>
+        </div>
+        <p class="mt-2 text-xs text-gray-500">
+          将从选中数据中随机抽取 <span id="inspectionFixedCountDisplay" class="font-medium text-blue-600">10</span> 条数据（约占 <span id="inspectionCountPercent" class="font-medium text-blue-600">0</span>%）
+        </p>
+      </div>
+
+      <!-- 批数量 -->
+      <!-- <div class="mb-6"> -->
+        <!-- <label class="block text-sm font-medium text-gray-700 mb-2">批数量</label> -->
+        <!-- <input type="number" id="inspectionBatchCount" value="1" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500"> -->
+        <!-- <p class="mt-2 text-xs text-gray-500"> -->
+          <!-- 将抽检数据分为多少批数据批次，默认为1表示生成一批抽检数据列表 -->
+        <!-- </p> -->
+      <!-- </div> -->
+
+      <!-- 选择抽检账号或抽检组 -->
+      <div class="mb-6">
+        <!-- <label class="block text-sm font-medium text-gray-700 mb-3">选择分配账号或组别</label> -->
+        
+        <!-- 抽检组搜索框 -->
+        <!-- <div class="mb-4"> -->
+          <!-- <label class="block text-sm font-medium text-gray-700 mb-2">选择抽检组</label> -->
+          <!-- <div class="w-full relative"> -->
+            <!-- <input type="text" id="inspectionGroupSearchInput" placeholder="搜索抽检组..." class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"> -->
+            <!-- <div id="inspectionGroupDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-button shadow-lg"> -->
+              <!-- <div class="border-t border-gray-200"> -->
+                <!-- <div class="p-2 border-b border-gray-200 flex justify-between items-center"> -->
+                  <!-- <span class="text-xs text-gray-500">抽检组列表</span> -->
+                  <!-- <button id="selectAllInspectionGroups" class="text-xs text-blue-500 hover:text-blue-700">全选</button> -->
+                <!-- </div> -->
+                <!-- <div id="inspectionGroupListContainer" class="max-h-48 overflow-y-auto"> -->
+                  <!-- <div class="inspection-group-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-group-id="inspection_group_1" data-group-name="抽检组A" data-group-count="3"> -->
+                    <!-- <span>抽检组A (3人)</span> -->
+                    <!-- <i class="fas fa-check text-blue-500 hidden"></i> -->
+                  <!-- </div> -->
+                  <!-- <div class="inspection-group-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-group-id="inspection_group_2" data-group-name="抽检组B" data-group-count="2"> -->
+                    <!-- <span>抽检组B (2人)</span> -->
+                    <!-- <i class="fas fa-check text-blue-500 hidden"></i> -->
+                  <!-- </div> -->
+                <!-- </div> -->
+              <!-- </div> -->
+            <!-- </div> -->
+          <!-- </div> -->
+          <!-- <p class="mt-2 text-xs text-gray-500">点击搜索框展开抽检组列表</p> -->
+        <!-- </div> -->
+
+        <!-- 抽检员搜索框 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">选择抽检账号</label>
+          <div class="w-full relative">
+            <input type="text" id="inspectionUserSearchInput" placeholder="搜索抽检员..." class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div id="inspectionUserDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-button shadow-lg">
+              <div class="border-t border-gray-200">
+                <div class="p-2 border-b border-gray-200 flex justify-between items-center">
+                  <span class="text-xs text-gray-500">抽检员列表</span>
+                  <button id="selectAllInspectionUsers" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+                </div>
+                <div id="inspectionUserListContainer" class="max-h-48 overflow-y-auto">
+                  <div class="inspection-user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="inspection_user_1" data-user-name="抽检员1">
+                    <span>抽检员1</span>
+                    <i class="fas fa-check text-blue-500 hidden"></i>
+                  </div>
+                  <div class="inspection-user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="inspection_user_2" data-user-name="抽检员2">
+                    <span>抽检员2</span>
+                    <i class="fas fa-check text-blue-500 hidden"></i>
+                  </div>
+                  <div class="inspection-user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="inspection_user_3" data-user-name="抽检员3">
+                    <span>抽检员3</span>
+                    <i class="fas fa-check text-blue-500 hidden"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">点击搜索框展开账号列表</p>
+        </div>
+
+        <!-- 所选抽检员/组名单预览 -->
+        <!-- <div id="selectedInspectorsPreview" class="mb-6 hidden"> -->
+          <!-- <label class="block text-sm font-medium text-gray-700 mb-3">所选抽检员/组名单</label> -->
+          <!-- <div id="selectedInspectorsList" class="border border-gray-200 rounded-lg p-3 max-h-32 overflow-y-auto text-sm bg-gray-50"> -->
+          <!-- </div> -->
+        <!-- </div> -->
+
+        <!-- 自动计算提示 -->
+        <!-- <div id="inspectionStats" class="mb-6 p-4 bg-green-50 rounded-lg hidden"> -->
+          <!-- <div class="text-sm text-green-700 space-y-1"> -->
+            <!-- <div>抽检数据量：<span id="inspectionTotal" class="font-medium">0</span> 条</div> -->
+            <!-- <div>已选抽检员/组：<span id="inspectorCount" class="font-medium">0</span> 个</div> -->
+            <!-- <div class="mt-2 text-xs">抽检数据将均匀分发</div> -->
+          <!-- </div> -->
+        <!-- </div> -->
+      <!-- </div> -->
+    <!-- </div> -->
+
+    <!-- 底部按钮 -->
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+      <button onclick="closeRandomInspectionPanel()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50">
+        取消
+      </button>
+      <button onclick="handleRandomInspection()" id="confirmInspectionBtn" disabled class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+        确认抽检
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- 随机抽检侧滑窗 -->
+<!-- <div id="randomInspectionPanel" class="side-panel"> -->
+  <!-- <div class="h-full flex flex-col"> -->
+    <!-- <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between"> -->
+      <!-- <h2 class="text-lg font-medium text-gray-900">随机抽检</h2> -->
+      <!-- <button onclick="closeInspectionPanel()" class="text-gray-400 hover:text-gray-600"> -->
+        <!-- <i class="fas fa-times"></i> -->
+      <!-- </button> -->
+    <!-- </div> -->
+    <!-- <div class="flex-1 overflow-y-auto p-6"> -->
+      <!-- <div class="mb-6 p-4 bg-blue-50 rounded-lg"> -->
+        <!-- <div class="text-sm text-blue-700"> -->
+          <!-- <i class="fas fa-info-circle mr-2"></i> -->
+          <!-- 已选择 <span id="randomInspectionPanelSelectedCount" class="font-medium">0</span> 条数据待抽检 -->
+        <!-- </div> -->
+      <!-- </div> -->
+      <!-- <div class="mb-6"> -->
+        <!-- <label class="block text-sm font-medium text-gray-700 mb-3">抽检比例 (%)</label> -->
+        <!-- <input type="number" id="inspectionRatio" min="1" max="100" value="10" class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"> -->
+        <!-- <p class="mt-2 text-xs text-gray-500">将从已选数据中随机抽取 <span id="inspectionCount">0</span> 条进行质检</p> -->
+      <!-- </div> -->
+      <!-- <div class="mb-6"> -->
+        <!-- <label class="block text-sm font-medium text-gray-700 mb-3">批数量</label> -->
+        <!-- <input type="number" id="inspectionBatchCount" min="1" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"> -->
+        <!-- <p class="mt-2 text-xs text-gray-500">抽检数据将分为 <span id="batchDisplay">1</span> 批进行处理</p> -->
+      <!-- </div> -->
+    <!-- </div> -->
+    <!-- <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3"> -->
+      <!-- <button onclick="closeInspectionPanel()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50"> -->
+        <!-- 取消 -->
+      <!-- </button> -->
+      <!-- <button onclick="handleInspectionConfirm()" id="confirmInspectionBtn" class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600"> -->
+        <!-- 确认 -->
+      <!-- </button> -->
+    <!-- </div> -->
+  <!-- </div> -->
+<!-- </div> -->
+
+<script>
+// 选中的数据ID集合
+let selectedIds = new Set();
+
+// 抽检任务列表
+let inspectionTasks = [
+  {
+    id: 1715078400000,
+    batchName: 'B00000001',
+    taskType: 'review',
+    batchId: 'BATCH-ZLK87F',
+    batchCount: 3,
+    createTime: '2026/5/7 10:00:00',
+    completeTime: '2026/5/7 14:30:00',
+    result: '通过',
+    inspector: 'inspector001',
+    cutStatus: '初审通过'
+  },
+  {
+    id: 1715064000000,
+    batchName: 'B00000002',
+    taskType: 'review',
+    batchId: 'BATCH-ZLK86G',
+    batchCount: 2,
+    createTime: '2026/5/7 06:00:00',
+    completeTime: '2026/5/7 09:15:00',
+    result: '拒绝',
+    inspector: 'inspector002',
+    cutStatus: '初审拒绝'
+  },
+  {
+    id: 1714977600000,
+    batchName: 'B00000003',
+    taskType: 'review',
+    batchId: 'BATCH-ZLK85H',
+    batchCount: 5,
+    createTime: '2026/5/6 08:00:00',
+    completeTime: null,
+    result: null,
+    inspector: 'inspector003',
+    cutStatus: '待审核'
+  },
+  {
+    id: 1714920000000,
+    batchName: 'B00000004',
+    taskType: 'review',
+    batchId: 'BATCH-ZLK84J',
+    batchCount: 1,
+    createTime: '2026/5/5 16:00:00',
+    completeTime: '2026/5/5 18:45:00',
+    result: '通过',
+    inspector: 'inspector001',
+    cutStatus: '初审通过'
+  },
+  {
+    id: 1714833600000,
+    batchName: 'B00000005',
+    taskType: 'review',
+    batchId: 'BATCH-ZLK83K',
+    batchCount: 4,
+    createTime: '2026/5/4 10:30:00',
+    completeTime: null,
+    result: null,
+    inspector: 'inspector002',
+    cutStatus: '初始'
+  },
+  {
+    id: 1714747200000,
+    batchName: 'B00000006',
+    taskType: 'initial',
+    createTime: '2026/5/3 09:00:00',
+    completeTime: '2026/5/3 12:00:00',
+    result: '通过',
+    inspector: 'reviewer001',
+    cutStatus: '初审通过'
+  },
+  {
+    id: 1714660800000,
+    batchName: 'B00000007',
+    taskType: 'initial',
+    createTime: '2026/5/2 14:00:00',
+    completeTime: null,
+    result: null,
+    inspector: 'reviewer002',
+    cutStatus: '待审核'
+  }
+];
+
+// 导航切换 - MWV切割
+document.getElementById('navMWV').addEventListener('click', function() {
+  document.getElementById('navMWV').classList.add('text-blue-400');
+  document.getElementById('navMWV').classList.remove('text-white');
+  document.getElementById('navQuality').classList.add('text-white');
+  document.getElementById('navQuality').classList.remove('text-blue-400');
+  document.getElementById('contentMWV').classList.remove('hidden');
+  document.getElementById('contentQuality').classList.add('hidden');
+});
+
+// 导航切换 - 数据质检
+document.getElementById('navQuality').addEventListener('click', function() {
+  document.getElementById('navQuality').classList.add('text-blue-400');
+  document.getElementById('navQuality').classList.remove('text-white');
+  document.getElementById('navMWV').classList.add('text-white');
+  document.getElementById('navMWV').classList.remove('text-blue-400');
+  document.getElementById('contentMWV').classList.add('hidden');
+  document.getElementById('contentQuality').classList.remove('hidden');
+  renderQualityTasks();
+});
+
+// 数据质检检索
+document.getElementById('qualitySearchBtn').addEventListener('click', function() {
+  renderQualityTasks();
+});
+
+// 抽检配置相关变量
+let samplingConfigured = false;
+let samplingType = 'percentage'; // 'percentage' or 'quantity'
+let samplingValue = 1;
+let sampledDataUUIDs = []; // 存储抽检数据的UUID列表
+
+// 抽检配置按钮事件
+document.getElementById('samplingConfigBtn').addEventListener('click', function() {
+  const btn = this;
+  
+  // 检查是否已经配置过
+  if (samplingConfigured) {
+    alert('抽检配置已经完成，不能重复配置！');
+    return;
+  }
+  
+  // 检查当前批次
+  const task = qualityTasks.find(t => t.id === currentQualityTaskId);
+  if (!task) return;
+  
+  // 检查是否所有数据都是初审通过
+  const isAllReviewPassed = Object.keys(task.statusStats).length === 1 && task.statusStats['初审通过'] !== undefined;
+  if (!isAllReviewPassed) {
+    alert('只有当批次所有数据都是初审通过状态时，才能进行抽检配置！');
+    return;
+  }
+  
+  // 检查批次是否已经终审通过或拒绝
+  const calculatedFinalStatus = calculateFinalStatus(task.statusStats);
+  if (calculatedFinalStatus === '终审通过' || calculatedFinalStatus === '终审拒绝') {
+    alert('批次已经终审完成，不能再进行抽检配置！');
+    return;
+  }
+  
+  showSamplingModal();
+});
+
+// 显示抽检配置模态框
+function showSamplingModal() {
+  const modalHtml = `
+    <div id="samplingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4">抽检配置</h3>
+        <div class="space-y-4">
+          <!-- 抽检类型选择 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">抽检类型</label>
+            <div class="flex gap-4">
+              <label class="flex items-center cursor-pointer">
+                <input type="radio" name="samplingType" value="percentage" checked class="w-4 h-4 text-blue-600 border-gray-300">
+                <span class="ml-2 text-sm text-gray-700">按比例抽检</span>
+              </label>
+              <label class="flex items-center cursor-pointer">
+                <input type="radio" name="samplingType" value="quantity" class="w-4 h-4 text-blue-600 border-gray-300">
+                <span class="ml-2 text-sm text-gray-700">按数量抽检</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- 比例输入框 -->
+          <div id="percentageInput" class="block">
+            <label class="block text-sm font-medium text-gray-700 mb-2">抽检比例</label>
+            <div class="flex items-center">
+              <input type="number" id="samplingPercentage" class="flex-1 px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500" value="1" min="0" max="100" step="0.1">
+              <span class="ml-2 text-gray-500">%</span>
+            </div>
+          </div>
+          
+          <!-- 数量输入框（初始隐藏） -->
+          <div id="quantityInput" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-2">抽检数量</label>
+            <div class="flex items-center">
+              <input type="number" id="samplingQuantity" class="flex-1 px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500" value="1" min="1">
+              <span class="ml-2 text-gray-500">条</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-3 mt-6">
+          <button id="samplingModalCancel" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-button hover:bg-gray-200">取消</button>
+          <button id="samplingModalConfirm" class="px-4 py-2 text-white bg-blue-600 rounded-button hover:bg-blue-700">确定</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // 添加到页面
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  // 添加事件监听
+  // 类型切换
+  document.querySelectorAll('input[name="samplingType"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.value === 'percentage') {
+        document.getElementById('percentageInput').classList.remove('hidden');
+        document.getElementById('quantityInput').classList.add('hidden');
+      } else {
+        document.getElementById('percentageInput').classList.add('hidden');
+        document.getElementById('quantityInput').classList.remove('hidden');
+      }
+    });
+  });
+  
+  // 取消按钮
+  document.getElementById('samplingModalCancel').addEventListener('click', function() {
+    document.getElementById('samplingModal').remove();
+  });
+  
+  // 确定按钮
+  document.getElementById('samplingModalConfirm').addEventListener('click', function() {
+    const type = document.querySelector('input[name="samplingType"]:checked').value;
+    let value;
+    
+    if (type === 'percentage') {
+      value = parseFloat(document.getElementById('samplingPercentage').value);
+      if (isNaN(value) || value <= 0 || value > 100) {
+        alert('请输入有效的抽检比例（0-100）！');
+        return;
+      }
+    } else {
+      value = parseInt(document.getElementById('samplingQuantity').value);
+      if (isNaN(value) || value <= 0) {
+        alert('请输入有效的抽检数量（大于0）！');
+        return;
+      }
+    }
+    
+    // 获取当前批次的数据UUID列表
+    const task = qualityTasks.find(t => t.id === currentQualityTaskId);
+    if (!task) {
+      alert('无法获取批次数据！');
+      return;
+    }
+    
+    // 生成模拟数据的UUID列表（实际应用中应该从服务器获取）
+    const dataCount = task.dataCount;
+    const allUUIDs = [];
+    for (let i = 0; i < dataCount; i++) {
+      // 生成UUID格式：以0或4开头的16位字符串
+      const prefix = i % 2 === 0 ? '0' : '4';
+      const uuid = prefix + Math.random().toString(36).substring(2, 17).padEnd(15, '0');
+      allUUIDs.push(uuid);
+    }
+    
+    // 计算需要抽检的数量
+    let sampleCount;
+    if (type === 'percentage') {
+      sampleCount = Math.max(1, Math.round(dataCount * value / 100));
+    } else {
+      sampleCount = Math.min(value, dataCount);
+    }
+    sampleCount = Math.max(1, sampleCount); // 最少抽1条
+    
+    // 随机选择抽检数据
+    const shuffled = [...allUUIDs].sort(() => Math.random() - 0.5);
+    sampledDataUUIDs = shuffled.slice(0, sampleCount);
+    
+    // 保存配置
+    samplingType = type;
+    samplingValue = value;
+    samplingConfigured = true;
+    
+    // 启用"只看抽检"复选框
+    const samplingCheckbox = document.getElementById('detailSamplingOnly');
+    samplingCheckbox.disabled = false;
+    samplingCheckbox.parentElement.querySelector('span').classList.remove('text-gray-500');
+    samplingCheckbox.parentElement.querySelector('span').classList.add('text-gray-700');
+    
+    // 禁用抽检配置按钮
+    document.getElementById('samplingConfigBtn').disabled = true;
+    document.getElementById('samplingConfigBtn').classList.add('opacity-50', 'cursor-not-allowed');
+    document.getElementById('samplingConfigBtn').classList.remove('hover:bg-green-700');
+    
+    // 关闭模态框
+    document.getElementById('samplingModal').remove();
+    
+    alert('抽检配置完成！');
+  });
+  
+  // 点击模态框背景关闭
+  document.getElementById('samplingModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.remove();
+    }
+  });
+}
+
+// 根据状态统计计算批次状态
+function calculateFinalStatus(statusStats) {
+  const statuses = Object.keys(statusStats);
+  
+  // 检查是否只有"待审核"状态
+  if (statuses.length === 1 && statuses[0] === '待审核') {
+    return '待初审';
+  }
+  
+  // 检查是否只有"初审通过"状态
+  if (statuses.length === 1 && statuses[0] === '初审通过') {
+    return '待终审';
+  }
+  
+  // 通过状态集合
+  const passStatuses = ['终审人工通过', '终审自动通过', '终审暂存'];
+  // 拒绝状态集合
+  const rejectStatuses = ['终审人工拒绝', '终审自动拒绝', '终审暂存'];
+  
+  // 检查是否所有状态都在通过集合中
+  const allInPass = statuses.every(status => passStatuses.includes(status));
+  // 检查是否所有状态都在拒绝集合中
+  const allInReject = statuses.every(status => rejectStatuses.includes(status));
+  
+  if (allInPass) {
+    return '终审通过';
+  } else if (allInReject) {
+    return '终审拒绝';
+  } else {
+    return '';
+  }
+}
+
+// 数据质检批次数据
+let qualityTasks = [
+  {
+    id: 1,
+    batchName: 'B1699912800000001',
+    dataCount: 50,
+    statusStats: {
+      '待审核': 50
+    },
+    cutter: 'jt@example.com',
+    reviewer: 'zhangsan@example.com',
+    finalReviewer: 'wangwu@example.com',
+    createTime: '2026/5/7 10:00:00'
+  },
+  {
+    id: 2,
+    batchName: 'B1699912860000002',
+    dataCount: 80,
+    statusStats: {
+      '初审通过': 80
+    },
+    cutter: 'lisi@example.com',
+    reviewer: 'lisi@example.com',
+    finalReviewer: 'admin@example.com',
+    createTime: '2026/5/7 08:00:00'
+  },
+  {
+    id: 3,
+    batchName: 'B1699912920000003',
+    dataCount: 60,
+    statusStats: {
+      '初审拒绝': 60
+    },
+    cutter: 'xiaoan@example.com',
+    reviewer: 'xiaoan@example.com',
+    finalReviewer: 'admin@example.com',
+    createTime: '2026/5/6 14:00:00'
+  },
+  {
+    id: 4,
+    batchName: 'B1699913000000004',
+    dataCount: 100,
+    statusStats: {
+      '初始': 100
+    },
+    cutter: 'test@example.com',
+    reviewer: '',
+    finalReviewer: '',
+    createTime: '2026/5/8 09:00:00'
+  },
+  {
+    id: 5,
+    batchName: 'B1699913100000005',
+    dataCount: 45,
+    statusStats: {
+      '终审人工通过': 40,
+      '终审暂存': 5
+    },
+    cutter: 'operator@example.com',
+    reviewer: 'reviewer1@example.com',
+    finalReviewer: 'final1@example.com',
+    createTime: '2026/5/8 11:00:00'
+  },
+  {
+    id: 6,
+    batchName: 'B1699913200000006',
+    dataCount: 30,
+    statusStats: {
+      '终审人工拒绝': 25,
+      '终审自动拒绝': 3,
+      '终审暂存': 2
+    },
+    cutter: 'operator@example.com',
+    reviewer: 'reviewer2@example.com',
+    finalReviewer: 'final2@example.com',
+    createTime: '2026/5/8 14:00:00'
+  },
+  {
+    id: 7,
+    batchName: 'B1699913300000007',
+    dataCount: 55,
+    statusStats: {
+      '终审人工通过': 30,
+      '终审人工拒绝': 25
+    },
+    cutter: 'operator@example.com',
+    reviewer: 'reviewer3@example.com',
+    finalReviewer: 'final3@example.com',
+    createTime: '2026/5/8 16:00:00'
+  }
+];
+
+// 渲染数据质检批次列表
+function renderQualityTasks() {
+  const tableBody = document.getElementById('qualityTaskTable');
+  const totalCount = document.getElementById('qualityTotalCount');
+  const showEnd = document.getElementById('qualityShowEnd');
+  
+  // 获取筛选条件
+  const batchIdFilter = document.getElementById('qualityBatchId').value.toLowerCase();
+  const createTimeFilter = document.getElementById('qualityCreateTime').value;
+  const cutterFilter = document.getElementById('qualityCutter').value.toLowerCase();
+  const reviewerFilter = document.getElementById('qualityReviewer').value.toLowerCase();
+  const finalReviewerFilter = document.getElementById('qualityFinalReviewer').value.toLowerCase();
+  const batchStatusFilter = document.getElementById('qualityBatchStatus').value;
+  
+  // 筛选数据
+  let filteredTasks = qualityTasks.filter(task => {
+    const matchBatchId = !batchIdFilter || task.batchName.toLowerCase().includes(batchIdFilter);
+    const matchCreateTime = !createTimeFilter || task.createTime.includes(createTimeFilter);
+    const matchCutter = !cutterFilter || task.cutter.toLowerCase().includes(cutterFilter);
+    const matchReviewer = !reviewerFilter || task.reviewer.toLowerCase().includes(reviewerFilter);
+    const matchFinalReviewer = !finalReviewerFilter || (!task.finalReviewer || task.finalReviewer.toLowerCase().includes(finalReviewerFilter));
+    
+    // 计算批次状态并匹配
+    const calculatedStatus = calculateFinalStatus(task.statusStats);
+    const matchBatchStatus = !batchStatusFilter || calculatedStatus === batchStatusFilter;
+    
+    return matchBatchId && matchCreateTime && matchCutter && matchReviewer && matchFinalReviewer && matchBatchStatus;
+  });
+  
+  tableBody.innerHTML = '';
+  
+  if (filteredTasks.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-sm text-muted_foreground">暂无批次数据</td></tr>';
+    totalCount.textContent = '0';
+    showEnd.textContent = '0';
+    return;
+  }
+  
+  filteredTasks.forEach(task => {
+    // 生成状态统计文本（每行显示一个状态，无色块）
+    const statusStatsHtml = Object.entries(task.statusStats).map(([status, count]) => {
+      return `<span class="text-muted_foreground">${status}: ${count}</span>`;
+    }).join('<br>');
+    
+    // 判断是否只有初始状态（可以删除）
+    const hasOnlyInitialStatus = Object.keys(task.statusStats).length === 1 && task.statusStats['初始'] !== undefined;
+    
+    // 生成初审人列内容
+    let reviewerHtml = '';
+    if (!task.reviewer) {
+      reviewerHtml = `<button data-task-id="${task.id}" data-type="reviewer" class="add-reviewer-btn text-blue-600 hover:text-blue-800">添加</button>`;
+    } else {
+      reviewerHtml = `<span class="font-medium">${task.reviewer}</span> <button data-task-id="${task.id}" data-type="reviewer" class="update-reviewer-btn text-gray-500 hover:text-gray-700 text-xs ml-1">更新</button>`;
+    }
+    
+    // 生成终审人列内容
+    let finalReviewerHtml = '';
+    if (!task.finalReviewer) {
+      finalReviewerHtml = `<button data-task-id="${task.id}" data-type="finalReviewer" class="add-reviewer-btn text-blue-600 hover:text-blue-800">添加</button>`;
+    } else {
+      finalReviewerHtml = `<span class="font-medium">${task.finalReviewer}</span> <button data-task-id="${task.id}" data-type="finalReviewer" class="update-reviewer-btn text-gray-500 hover:text-gray-700 text-xs ml-1">更新</button>`;
+    }
+    
+    // 计算终审状态
+    const calculatedFinalStatus = calculateFinalStatus(task.statusStats);
+    
+    // 设置终审状态样式
+    let finalStatusClass = '';
+    let finalStatusText = calculatedFinalStatus || '--';
+    if (calculatedFinalStatus === '终审通过') {
+      finalStatusClass = 'status-final-passed';
+    } else if (calculatedFinalStatus === '终审拒绝') {
+      finalStatusClass = 'status-final-rejected';
+    } else if (calculatedFinalStatus === '待终审') {
+      finalStatusClass = 'status-final-pending';
+    }
+    
+    // 删除按钮样式
+    const deleteBtnClass = hasOnlyInitialStatus ? 'delete-quality-btn text-red-500 hover:text-red-700' : 'delete-quality-btn text-gray-300 cursor-not-allowed';
+    const deleteBtnDisabled = hasOnlyInitialStatus ? '' : 'disabled';
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" style="color: black;">${task.batchName}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">${task.dataCount}</td>
+      <td class="px-6 py-3 text-sm text-muted_foreground">${statusStatsHtml}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">${task.cutter || '-'}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm">${reviewerHtml}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm">${finalReviewerHtml}</td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="status-tag ${finalStatusClass}">${finalStatusText}</span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm">
+        <button data-task-id="${task.id}" class="view-quality-btn text-primary hover:text-blue-600">查看</button>
+        <span class="mx-1">|</span>
+        <button data-task-id="${task.id}" class="${deleteBtnClass}" ${deleteBtnDisabled}>删除</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+  
+  // 添加事件委托
+  tableBody.addEventListener('click', function(e) {
+    const target = e.target;
+    if (target.classList.contains('view-quality-btn')) {
+      const taskId = parseInt(target.dataset.taskId);
+      viewQualityTask(taskId);
+    } else if (target.classList.contains('delete-quality-btn')) {
+      const taskId = parseInt(target.dataset.taskId);
+      deleteQualityTask(taskId);
+    } else if (target.classList.contains('add-reviewer-btn')) {
+      const taskId = parseInt(target.dataset.taskId);
+      const type = target.dataset.type;
+      showAddReviewerModal(taskId, type, false);
+    } else if (target.classList.contains('update-reviewer-btn')) {
+      const taskId = parseInt(target.dataset.taskId);
+      const type = target.dataset.type;
+      showAddReviewerModal(taskId, type, true);
+    }
+  });
+  
+  totalCount.textContent = filteredTasks.length;
+  showEnd.textContent = filteredTasks.length;
+}
+
+// 当前查看的批次ID
+let currentQualityTaskId = null;
+
+// 查看批次详情
+function viewQualityTask(taskId) {
+  const task = qualityTasks.find(t => t.id === taskId);
+  if (!task) return;
+  
+  currentQualityTaskId = taskId;
+  
+  // 计算终审状态
+  const calculatedFinalStatus = calculateFinalStatus(task.statusStats);
+  
+  // 更新批次信息
+  document.getElementById('detailBatchId').textContent = task.batchName;
+  document.getElementById('detailCutter').textContent = task.cutter || '-';
+  document.getElementById('detailReviewer').textContent = task.reviewer || '-';
+  document.getElementById('detailFinalReviewer').textContent = task.finalReviewer || '-';
+  document.getElementById('detailFinalStatus').textContent = calculatedFinalStatus || '--';
+  
+  // 检查是否所有数据都是初审通过状态（可以进行抽检配置）
+  const isAllReviewPassed = Object.keys(task.statusStats).length === 1 && task.statusStats['初审通过'] !== undefined;
+  
+  // 检查批次是否已经终审通过或拒绝（此时不能再配置抽检）
+  const isFinalized = calculatedFinalStatus === '终审通过' || calculatedFinalStatus === '终审拒绝';
+  
+  // 设置抽检配置按钮状态：只有当所有数据都是初审通过且未终审时才能配置
+  const samplingBtn = document.getElementById('samplingConfigBtn');
+  if (isAllReviewPassed && !isFinalized) {
+    samplingBtn.disabled = false;
+    samplingBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    samplingBtn.classList.add('hover:bg-green-700');
+  } else {
+    samplingBtn.disabled = true;
+    samplingBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    samplingBtn.classList.remove('hover:bg-green-700');
+  }
+  
+  // 设置"只看抽检"复选框状态：已配置过抽检或者批次已终审时可以查看抽检数据
+  const samplingCheckbox = document.getElementById('detailSamplingOnly');
+  if (samplingConfigured || isFinalized) {
+    samplingCheckbox.disabled = false;
+    samplingCheckbox.parentElement.querySelector('span').classList.remove('text-gray-500');
+    samplingCheckbox.parentElement.querySelector('span').classList.add('text-gray-700');
+    
+    // 如果批次已终审但没有配置过抽检，自动生成抽检数据（全量数据的1%，最少1条）
+    if (isFinalized && !samplingConfigured) {
+      const dataCount = task.dataCount;
+      const sampleCount = Math.max(1, Math.round(dataCount * 0.01));
+      
+      // 生成模拟数据的UUID列表
+      const allUUIDs = [];
+      for (let i = 0; i < dataCount; i++) {
+        const prefix = i % 2 === 0 ? '0' : '4';
+        const uuid = prefix + Math.random().toString(36).substring(2, 17).padEnd(15, '0');
+        allUUIDs.push(uuid);
+      }
+      
+      // 随机选择抽检数据
+      const shuffled = [...allUUIDs].sort(() => Math.random() - 0.5);
+      sampledDataUUIDs = shuffled.slice(0, sampleCount);
+    }
+  } else {
+    samplingCheckbox.disabled = true;
+    samplingCheckbox.parentElement.querySelector('span').classList.add('text-gray-500');
+    samplingCheckbox.parentElement.querySelector('span').classList.remove('text-gray-700');
+  }
+  
+  // 渲染数据列表（传递批次状态统计用于生成一致的数据）
+  renderDetailData(task.batchName, calculatedFinalStatus, task.statusStats);
+  
+  // 显示详情页面
+  document.getElementById('contentQuality').classList.add('hidden');
+  document.getElementById('contentQualityDetail').classList.remove('hidden');
+}
+
+// 返回数据质检列表
+function goBackToQualityList() {
+  document.getElementById('contentQualityDetail').classList.add('hidden');
+  document.getElementById('contentQuality').classList.remove('hidden');
+  
+  // 重置抽检配置状态
+  samplingConfigured = false;
+  samplingType = 'percentage';
+  samplingValue = 1;
+  sampledDataUUIDs = []; // 清空抽检数据列表
+  
+  // 禁用"只看抽检"复选框
+  const samplingCheckbox = document.getElementById('detailSamplingOnly');
+  samplingCheckbox.disabled = true;
+  samplingCheckbox.checked = false;
+  samplingCheckbox.parentElement.querySelector('span').classList.add('text-gray-500');
+  samplingCheckbox.parentElement.querySelector('span').classList.remove('text-gray-700');
+  
+  // 启用抽检配置按钮
+  const samplingBtn = document.getElementById('samplingConfigBtn');
+  samplingBtn.disabled = false;
+  samplingBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  samplingBtn.classList.add('hover:bg-green-700');
+}
+
+// 删除批次
+function deleteQualityTask(taskId) {
+  const task = qualityTasks.find(t => t.id === taskId);
+  if (!task) return;
+  
+  // 检查是否只有初始状态
+  const hasOnlyInitialStatus = Object.keys(task.statusStats).length === 1 && task.statusStats['初始'] !== undefined;
+  
+  if (!hasOnlyInitialStatus) {
+    alert('只有状态为初始的批次才能删除！');
+    return;
+  }
+  
+  if (confirm('确定要删除这个批次吗？')) {
+    qualityTasks = qualityTasks.filter(t => t.id !== taskId);
+    renderQualityTasks();
+  }
+}
+
+// 显示添加审核人模态框
+function showAddReviewerModal(taskId, type, isUpdate) {
+  const task = qualityTasks.find(t => t.id === taskId);
+  if (!task) return;
+  
+  const isReviewer = type === 'reviewer';
+  const title = isUpdate ? '更新审核人' : '添加审核人';
+  const label = isReviewer ? '初审人账号' : '终审人账号';
+  const currentValue = isReviewer ? task.reviewer : task.finalReviewer;
+  
+  // 创建模态框HTML
+  const modalHtml = `
+    <div id="reviewerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4">${title}</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">${label}</label>
+            <input type="text" id="modalReviewerInput" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入${label}" value="${currentValue || ''}">
+          </div>
+        </div>
+        <div class="flex justify-end space-x-3 mt-6">
+          <button id="modalCancel" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">取消</button>
+          <button id="modalConfirm" class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">确定</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // 添加到页面
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  // 添加事件监听
+  document.getElementById('modalCancel').addEventListener('click', function() {
+    document.getElementById('reviewerModal').remove();
+  });
+  
+  document.getElementById('modalConfirm').addEventListener('click', function() {
+    const value = document.getElementById('modalReviewerInput').value.trim();
+    
+    // 验证输入不能为空
+    if (!value) {
+      alert('请输入${label}！');
+      return;
+    }
+    
+    // 更新对应的字段
+    if (isReviewer) {
+      task.reviewer = value;
+    } else {
+      task.finalReviewer = value;
+    }
+    
+    // 重新渲染批次列表
+    renderQualityTasks();
+    
+    // 关闭模态框
+    document.getElementById('reviewerModal').remove();
+  });
+  
+  // 点击模态框背景关闭
+  document.getElementById('reviewerModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.remove();
+    }
+  });
+}
+
+// 切割状态列表
+const cutStatusOptions = ['初始', '待审核', '初审通过', '初审拒绝', '终审人工通过', '终审自动通过', '终审人工拒绝', '终审自动拒绝', '终审暂存'];
+
+// 抽检状态列表（只看抽检时显示的状态）
+const samplingStatuses = ['终审人工通过', '终审人工拒绝', '终审暂存', '初审通过'];
+
+// 根据批次终审状态获取允许的数据状态列表
+function getStatusesByFinalStatus(finalStatus) {
+  if (finalStatus === '终审通过') {
+    return ['终审人工通过', '终审自动通过', '终审暂存'];
+  } else if (finalStatus === '终审拒绝') {
+    return ['终审人工拒绝', '终审自动拒绝', '终审暂存'];
+  } else {
+    return cutStatusOptions;
+  }
+}
+
+// 渲染详情数据列表
+function renderDetailData(batchId, batchFinalStatus, statusStats) {
+  const tableBody = document.getElementById('detailDataTable');
+  const totalCount = document.getElementById('detailTotalCount');
+  const showEnd = document.getElementById('detailShowEnd');
+  
+  // 获取筛选条件
+  const uuidFilter = document.getElementById('detailUuid').value.toLowerCase();
+  const dataTypeFilter = document.getElementById('detailDataType').value;
+  const modifyTimeFilter = document.getElementById('detailModifyTime').value;
+  const cutStatusFilter = document.getElementById('detailCutStatus').value;
+  const samplingOnly = document.getElementById('detailSamplingOnly').checked;
+  
+  // 数据类型列表
+  const dataTypes = ['I类', 'II类', 'III类', 'IV类'];
+  
+  // 获取当前批次的数据总数
+  const task = qualityTasks.find(t => t.id === currentQualityTaskId);
+  const dataCount = task ? task.dataCount : 15;
+  
+  // 如果抽检数据为空且需要显示抽检数据，先生成抽检数据（使用确定性方式）
+  if (samplingOnly && sampledDataUUIDs.length === 0) {
+    const sampleCount = Math.max(1, Math.round(dataCount * 0.01));
+    const sampledUUIDs = [];
+    
+    // 生成抽检数据的UUID（使用固定的伪随机方式）
+    for (let i = 0; i < sampleCount; i++) {
+      const prefix = i % 2 === 0 ? '0' : '4';
+      // 使用固定的种子生成UUID，确保每次刷新都生成相同的抽检UUID
+      const seed = i + 1;
+      const randomPart = (seed * 9301 + 49297) % 233280 / 233280;
+      const uuid = prefix + randomPart.toString(36).substring(2, 17).padEnd(15, '0');
+      sampledUUIDs.push(uuid);
+    }
+    
+    sampledDataUUIDs = sampledUUIDs;
+  }
+  
+  // 生成模拟数据（根据批次状态统计生成对应的切割状态）
+  const mockData = [];
+  
+  // 先添加抽检数据（确保抽检数据能显示）
+  if (samplingOnly && sampledDataUUIDs.length > 0) {
+    // 获取允许的状态列表
+    const allowedStatuses = getStatusesByFinalStatus(batchFinalStatus);
+    
+    sampledDataUUIDs.forEach((uuid, index) => {
+      // 从允许的状态中随机选择一个
+      const randomStatus = allowedStatuses[Math.floor(Math.random() * allowedStatuses.length)];
+      
+      mockData.push({
+        uuid: uuid,
+        dataType: dataTypes[Math.floor(Math.random() * dataTypes.length)],
+        modifyTime: `2026/5/${Math.floor(Math.random() * 7) + 1} ${Math.floor(Math.random() * 24)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}:00`,
+        cutStatus: randomStatus
+      });
+    });
+  }
+  
+  // 根据批次状态统计生成剩余数据（最多15条）
+  if (statusStats && mockData.length < 15) {
+    Object.entries(statusStats).forEach(([status, count]) => {
+      for (let i = 0; i < Math.min(count, 15 - mockData.length); i++) {
+        // 生成UUID
+        const uuidIndex = mockData.length;
+        const prefix = uuidIndex % 2 === 0 ? '0' : '4';
+        const randomPart = Math.random().toString(36).substring(2, 17).padEnd(15, '0');
+        const uuid = (prefix + randomPart).substring(0, 16);
+        
+        mockData.push({
+          uuid: uuid,
+          dataType: dataTypes[Math.floor(Math.random() * dataTypes.length)],
+          modifyTime: `2026/5/${Math.floor(Math.random() * 7) + 1} ${Math.floor(Math.random() * 24)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}:00`,
+          cutStatus: status
+        });
+        
+        if (mockData.length >= 15) return;
+      }
+    });
+  }
+  
+  // 如果数据不足15条，补充一些数据
+  while (mockData.length < 15) {
+    const prefix = Math.random() > 0.5 ? '0' : '4';
+    const randomChars = Math.random().toString(36).substring(2, 16);
+    const uuid = (prefix + randomChars).substring(0, 16);
+    
+    // 从状态统计中随机选择一个状态
+    const statusList = statusStats ? Object.keys(statusStats) : ['初始', '待审核', '初审通过', '初审拒绝'];
+    const randomStatus = statusList[Math.floor(Math.random() * statusList.length)];
+    
+    mockData.push({
+      uuid: uuid,
+      dataType: dataTypes[Math.floor(Math.random() * dataTypes.length)],
+      modifyTime: `2026/5/${Math.floor(Math.random() * 7) + 1} ${Math.floor(Math.random() * 24)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}:00`,
+      cutStatus: randomStatus
+    });
+  }
+  
+  // 筛选数据
+  let filteredData;
+  
+  // 如果勾选了只看抽检且有抽检数据，只显示抽检数据
+  if (samplingOnly && sampledDataUUIDs.length > 0) {
+    filteredData = mockData.filter(item => {
+      const isSampled = sampledDataUUIDs.includes(item.uuid);
+      const matchUuid = !uuidFilter || item.uuid.toLowerCase().includes(uuidFilter);
+      const matchDataType = !dataTypeFilter || item.dataType === dataTypeFilter;
+      const matchModifyTime = !modifyTimeFilter || item.modifyTime.includes(modifyTimeFilter.replace(/-/g, '/'));
+      const matchCutStatus = !cutStatusFilter || item.cutStatus === cutStatusFilter;
+      return isSampled && matchUuid && matchDataType && matchModifyTime && matchCutStatus;
+    });
+  } else {
+    filteredData = mockData.filter(item => {
+      const matchUuid = !uuidFilter || item.uuid.toLowerCase().includes(uuidFilter);
+      const matchDataType = !dataTypeFilter || item.dataType === dataTypeFilter;
+      const matchModifyTime = !modifyTimeFilter || item.modifyTime.includes(modifyTimeFilter.replace(/-/g, '/'));
+      const matchCutStatus = !cutStatusFilter || item.cutStatus === cutStatusFilter;
+      return matchUuid && matchDataType && matchModifyTime && matchCutStatus;
+    });
+  }
+  
+  tableBody.innerHTML = '';
+  
+  if (filteredData.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-sm text-muted_foreground">暂无数据</td></tr>';
+    totalCount.textContent = '0';
+    showEnd.textContent = '0';
+    return;
+  }
+  
+  filteredData.forEach(item => {
+    // 设置切割状态样式
+    let cutStatusClass = '';
+    if (item.cutStatus === '初始') {
+      cutStatusClass = 'status-waiting';
+    } else if (item.cutStatus === '待审核') {
+      cutStatusClass = 'status-review-pending';
+    } else if (item.cutStatus === '初审通过') {
+      cutStatusClass = 'status-review-passed';
+    } else if (item.cutStatus === '初审拒绝') {
+      cutStatusClass = 'status-review-rejected';
+    } else if (item.cutStatus === '终审人工通过' || item.cutStatus === '终审自动通过') {
+      cutStatusClass = 'status-final-passed';
+    } else if (item.cutStatus === '终审人工拒绝' || item.cutStatus === '终审自动拒绝') {
+      cutStatusClass = 'status-final-rejected';
+    } else if (item.cutStatus === '终审暂存') {
+      cutStatusClass = 'status-processing';
+    }
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-sidebar_foreground">
+        <a href="#" class="text-primary hover:underline">${item.uuid}</a>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">${item.modifyTime}</td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="status-tag ${cutStatusClass}">${item.cutStatus}</span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-muted_foreground">
+        <a href="./app.html" class="text-primary hover:text-blue-600">查看详情</a>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+  
+  totalCount.textContent = filteredData.length;
+  showEnd.textContent = filteredData.length;
+}
+
+// 详情页检索
+document.getElementById('detailSearchBtn').addEventListener('click', function() {
+  const task = qualityTasks.find(t => t.id === currentQualityTaskId);
+  if (task) {
+    const calculatedFinalStatus = calculateFinalStatus(task.statusStats);
+    renderDetailData(task.batchName, calculatedFinalStatus, task.statusStats);
+  }
+});
+
+// 只看抽检勾选变化时重新渲染
+document.getElementById('detailSamplingOnly').addEventListener('change', function() {
+  const task = qualityTasks.find(t => t.id === currentQualityTaskId);
+  if (task) {
+    const calculatedFinalStatus = calculateFinalStatus(task.statusStats);
+    renderDetailData(task.batchName, calculatedFinalStatus, task.statusStats);
+  }
+});
+
+// 批量通过
+document.getElementById('detailBatchApproveBtn').addEventListener('click', function() {
+  if (!currentQualityTaskId) return;
+  
+  if (confirm('确定要批量通过吗？')) {
+    const task = qualityTasks.find(t => t.id === currentQualityTaskId);
+    if (task) {
+      task.finalStatus = '终审通过';
+      task.finalReviewer = 'current_user';
+      // 更新状态统计为全部通过
+      task.statusStats = { '终审人工通过': task.dataCount };
+    }
+    document.getElementById('detailFinalStatus').textContent = '终审通过';
+    renderQualityTasks();
+    alert('批量通过成功！');
+  }
+});
+
+// 批量拒绝
+document.getElementById('detailBatchRejectBtn').addEventListener('click', function() {
+  if (!currentQualityTaskId) return;
+  
+  if (confirm('确定要批量拒绝吗？')) {
+    const task = qualityTasks.find(t => t.id === currentQualityTaskId);
+    if (task) {
+      task.finalStatus = '终审拒绝';
+      task.finalReviewer = 'current_user';
+      // 更新状态统计为全部拒绝
+      task.statusStats = { '终审人工拒绝': task.dataCount };
+    }
+    document.getElementById('detailFinalStatus').textContent = '终审拒绝';
+    renderQualityTasks();
+    alert('批量拒绝成功！');
+  }
+});
+
+// 侧边栏折叠/展开功能
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const mainContent = document.querySelector('.main-content');
+  const collapseBtn = document.querySelector('.collapse-btn');
+  
+  if (sidebar.classList.contains('collapsed')) {
+    sidebar.classList.remove('collapsed');
+    mainContent.style.marginLeft = '240px';
+    collapseBtn.innerHTML = '&lt;';
+  } else {
+    sidebar.classList.add('collapsed');
+    mainContent.style.marginLeft = '64px';
+    collapseBtn.innerHTML = '&gt;';
+  }
+}
+
+// 搜索功能
+function handleSearch() {
+  console.log('执行搜索');
+}
+
+// 重置功能
+function handleReset() {
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('startDate').value = '';
+  document.getElementById('endDate').value = '';
+  document.getElementById('batchIdFilter').value = '';
+  document.getElementById('uuidFilter').value = '';
+  document.getElementById('seatFilter').value = '';
+  document.getElementById('dataTypeFilter').value = '';
+  document.getElementById('cutterFilter').value = '';
+  document.getElementById('reviewerFilter').value = '';
+}
+
+// 选择当前页
+function handleSelectAll() {
+  const selectAllCheckbox = document.getElementById('selectAll');
+  const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+  
+  rowCheckboxes.forEach(checkbox => {
+    checkbox.checked = selectAllCheckbox.checked;
+    const row = checkbox.closest('tr');
+    const id = row.dataset.id;
+    
+    if (selectAllCheckbox.checked) {
+      selectedIds.add(id);
+    } else {
+      selectedIds.delete(id);
+    }
+  });
+  
+  updateSelectedInfo();
+}
+
+// 选择全部数据
+function handleSelectAllData() {
+  const allIds = ['1', '2', '3', '4', '5'];
+  allIds.forEach(id => selectedIds.add(id));
+  
+  document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+    checkbox.checked = true;
+  });
+  
+  updateSelectedInfo();
+}
+
+// 单行选择
+function handleRowSelect(checkbox) {
+  const row = checkbox.closest('tr');
+  const id = row.dataset.id;
+  
+  if (checkbox.checked) {
+    selectedIds.add(id);
+  } else {
+    selectedIds.delete(id);
+  }
+  
+  updateSelectedInfo();
+}
+
+// 更新选中信息
+function updateSelectedInfo() {
+  const selectedInfo = document.getElementById('selectedInfo');
+  const selectedCount = document.getElementById('selectedCount');
+  const batchOperationButton = document.getElementById('batchOperationButton');
+  
+  if (selectedIds.size > 0) {
+    selectedInfo.classList.remove('hidden');
+    selectedCount.textContent = selectedIds.size;
+    batchOperationButton.disabled = false;
+  } else {
+    selectedInfo.classList.add('hidden');
+    batchOperationButton.disabled = true;
+    document.getElementById('batchOperationMenu').classList.add('hidden');
+  }
+}
+
+// 批量操作下拉菜单
+const batchOperationButton = document.getElementById('batchOperationButton');
+const batchOperationMenu = document.getElementById('batchOperationMenu');
+
+batchOperationButton.addEventListener('click', function(e) {
+  e.stopPropagation();
+  batchOperationMenu.classList.toggle('hidden');
+});
+
+// 打开数据切割分配面板
+function openDispatchPanel() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('dispatchPanel').classList.add('open');
+  document.getElementById('panelSelectedCount').textContent = selectedIds.size;
+  updateAnnotatorPreview();
+}
+
+// 关闭数据切割分配面板
+function closeDispatchPanel() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('dispatchPanel').classList.remove('open');
+  document.getElementById('userDropdownMenu').classList.add('hidden');
+}
+
+// 打开初审下发面板
+function openQualityPanel() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('qualityPanel').classList.add('open');
+  document.getElementById('qualityPanelSelectedCount').textContent = selectedIds.size;
+}
+
+// 关闭初审下发面板
+function closeQualityPanel() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('qualityPanel').classList.remove('show');
+}
+
+// 打开随机抽检面板
+function openRandomInspectionPanel() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('randomInspectionPanel').classList.add('open');
+  document.getElementById('randomInspectionPanelSelectedCount').textContent = selectedIds.size;
+  updateInspectionCount();
+  updateInspectionPreview();
+}
+
+// 关闭随机抽检面板
+function closeInspectionPanel() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('randomInspectionPanel').classList.remove('open');
+  document.getElementById('inspectionGroupDropdownMenu').classList.add('hidden');
+  document.getElementById('inspectionUserDropdownMenu').classList.add('hidden');
+}
+
+// 关闭随机抽检面板（别名）
+function closeRandomInspectionPanel() {
+  closeInspectionPanel();
+}
+
+// 更新抽检数量显示
+function updateInspectionCount() {
+  const ratio = parseInt(document.getElementById('inspectionRatio').value) || 10;
+  const total = selectedIds.size;
+  const count = Math.ceil(total * ratio / 100);
+  document.getElementById('inspectionCount').textContent = count;
+}
+
+
+
+// 抽检数量变化时更新预览
+document.getElementById('inspectionFixedCount').addEventListener('input', function() {
+  document.getElementById('inspectionFixedCountDisplay').textContent = this.value;
+  updateInspectionCount();
+  updateInspectionPreview();
+});
+
+// 更新抽检数量显示
+function updateInspectionCount() {
+  const selectedCount = selectedIds.size;
+  const mode = document.querySelector('input[name="inspectionMode"]:checked').value;
+  
+  if (mode === 'ratio') {
+    const ratio = parseInt(document.getElementById('inspectionRatio').value) || 0;
+    const inspectionCount = Math.ceil(selectedCount * ratio / 100);
+    document.getElementById('inspectionCount').textContent = inspectionCount;
+    document.getElementById('inspectionPercent').textContent = ratio;
+  } else {
+    const count = parseInt(document.getElementById('inspectionFixedCount').value) || 0;
+    const percent = selectedCount > 0 ? ((count / selectedCount) * 100).toFixed(1) : 0;
+    document.getElementById('inspectionFixedCountDisplay').textContent = count;
+    document.getElementById('inspectionCountPercent').textContent = percent;
+  }
+}
+
+// 获取选中的抽检员/组
+function getSelectedInspectors() {
+  const inspectors = [];
+  
+  // 获取选中的抽检组
+  document.querySelectorAll('.inspection-group-item i.selected').forEach(icon => {
+    const item = icon.closest('.inspection-group-item');
+    inspectors.push({
+      type: 'inspectionGroup',
+      id: item.dataset.groupId,
+      name: item.dataset.groupName,
+      count: parseInt(item.dataset.groupCount) || 1
+    });
+  });
+  
+  // 获取选中的抽检员
+  document.querySelectorAll('.inspection-user-item i.selected').forEach(icon => {
+    const item = icon.closest('.inspection-user-item');
+    inspectors.push({
+      type: 'inspectionUser',
+      id: item.dataset.userId,
+      name: item.dataset.userName,
+      count: 1
+    });
+  });
+  
+  return inspectors;
+}
+
+// 更新抽检选择预览
+function updateInspectionPreview() {
+  const inspectors = getSelectedInspectors();
+  const previewSection = document.getElementById('selectedInspectorsPreview');
+  const previewList = document.getElementById('selectedInspectorsList');
+  const statsSection = document.getElementById('inspectionStats');
+  const confirmBtn = document.getElementById('confirmInspectionBtn');
+  
+  if (inspectors.length === 0) {
+    previewSection.classList.add('hidden');
+    statsSection.classList.add('hidden');
+    confirmBtn.disabled = true;
+    return;
+  }
+  
+  previewSection.classList.remove('hidden');
+  statsSection.classList.remove('hidden');
+  confirmBtn.disabled = false;
+  
+  // 更新名单预览
+  const names = inspectors.map(i => i.name);
+  previewList.innerHTML = names.join('<br>');
+  
+  // 更新统计
+  const ratio = parseInt(document.getElementById('inspectionRatio').value) || 10;
+  const totalItems = selectedIds.size;
+  const inspectionCount = Math.ceil(totalItems * ratio / 100);
+  
+  document.getElementById('inspectionTotal').textContent = inspectionCount;
+  document.getElementById('inspectorCount').textContent = inspectors.length;
+}
+
+// 生成下一个批次名（B开头的8位递增序列）
+function generateNextBatchName() {
+  let maxNum = 0;
+  inspectionTasks.forEach(task => {
+    if (task.batchName && task.batchName.startsWith('B')) {
+      const num = parseInt(task.batchName.substring(1));
+      if (!isNaN(num) && num > maxNum) {
+        maxNum = num;
+      }
+    }
+  });
+  return 'B' + String(maxNum + 1).padStart(8, '0');
+}
+
+// 确认随机抽检
+function handleRandomInspection() {
+  const batchCount = 1;
+  const inspectors = getSelectedInspectors();
+  const totalItems = selectedIds.size;
+  
+  // 根据抽检方式计算抽检数量
+  const mode = document.querySelector('input[name="inspectionMode"]:checked').value;
+  let inspectionCount, ratio;
+  
+  if (mode === 'ratio') {
+    ratio = parseInt(document.getElementById('inspectionRatio').value) || 10;
+    inspectionCount = Math.ceil(totalItems * ratio / 100);
+  } else {
+    inspectionCount = parseInt(document.getElementById('inspectionFixedCount').value) || 10;
+    ratio = totalItems > 0 ? ((inspectionCount / totalItems) * 100).toFixed(1) : 0;
+  }
+  
+  // 生成批次ID和批次名
+  const batchId = 'BATCH-' + Date.now().toString(36).toUpperCase();
+  const batchName = generateNextBatchName();
+  
+  // 创建抽检任务
+  const newTask = {
+    id: Date.now(),
+    batchName: batchName,
+    taskType: 'review',
+    batchId: batchId,
+    createTime: new Date().toLocaleString('zh-CN'),
+    completeTime: null,
+    result: null,
+    batchCount: batchCount,
+    inspector: inspectors.map(i => i.name).join(', ') || '-'
+  };
+  
+  // 添加到任务列表
+  inspectionTasks.unshift(newTask);
+  
+  let message = `抽检任务创建成功！\n批次名: ${batchName}\n已从 ${totalItems} 条数据中随机抽取 ${inspectionCount} 条（${mode === 'ratio' ? '比例' : '固定数量'}：${mode === 'ratio' ? ratio + '%' : inspectionCount + '条'}），打包成 ${batchCount} 个批次，分发给 ${inspectors.length} 个抽检员/组`;
+  
+  alert(message);
+  closeRandomInspectionPanel();
+  
+  // 清空选择
+  selectedIds.clear();
+  updateSelectedInfo();
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('selectAll').checked = false;
+  
+  // 清空任务名输入框
+  document.getElementById('inspectionTaskName').value = '';
+}
+
+// 确认质检下发
+function handleQualityDispatch() {
+  const totalItems = selectedIds.size;
+  
+  // 生成批次名
+  const batchName = generateNextBatchName();
+  
+  // 创建初审任务
+  const newTask = {
+    id: Date.now(),
+    batchName: batchName,
+    taskType: 'initial',
+    createTime: new Date().toLocaleString('zh-CN'),
+    completeTime: null,
+    result: null,
+    inspector: '-'
+  };
+  
+  // 添加到任务列表
+  inspectionTasks.unshift(newTask);
+  
+  alert(`质检任务创建成功！\n批次名: ${batchName}\n已将 ${totalItems} 条数据下发质检`);
+  closeQualityPanel();
+  
+  // 清空任务名
+  document.getElementById('qualityTaskName').value = '';
+  
+  // 清空选择
+  selectedIds.clear();
+  updateSelectedInfo();
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('selectAll').checked = false;
+}
+
+// 确认数据切割分配
+function handleDispatch() {
+  const annotators = getSelectedAnnotators();
+  const totalItems = selectedIds.size;
+  
+  const message = `已将 ${totalItems} 条数据均匀分发给 ${annotators.length} 个标注员`;
+  
+  alert(message);
+  closeDispatchPanel();
+  
+  // 清空选择
+  selectedIds.clear();
+  updateSelectedInfo();
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('selectAll').checked = false;
+}
+
+// 获取选中的标注员
+function getSelectedAnnotators() {
+  const annotators = [];
+  document.querySelectorAll('.user-item i.selected').forEach(icon => {
+    const item = icon.closest('.user-item');
+    const displayName = item.querySelector('span').textContent || item.dataset.userName;
+    annotators.push({
+      type: 'user',
+      id: item.dataset.userId,
+      name: displayName,
+      count: 1
+    });
+  });
+  return annotators;
+}
+
+// 更新标注员选择文本
+function updateAnnotatorPreview() {
+  const annotators = getSelectedAnnotators();
+  const previewSection = document.getElementById('selectedAnnotatorsPreview');
+  const previewList = document.getElementById('selectedAnnotatorsList');
+  const statsSection = document.getElementById('dispatchStats');
+  const previewContent = document.getElementById('dispatchPreview');
+  const confirmBtn = document.getElementById('confirmDispatchBtn');
+  
+  if (annotators.length === 0) {
+    previewSection.classList.add('hidden');
+    statsSection.classList.add('hidden');
+    previewContent.classList.add('hidden');
+    confirmBtn.disabled = true;
+    return;
+  }
+  
+  previewSection.classList.remove('hidden');
+  statsSection.classList.remove('hidden');
+  previewContent.classList.remove('hidden');
+  confirmBtn.disabled = false;
+  
+  // 更新名单预览
+  const names = annotators.map(a => a.name);
+  previewList.innerHTML = names.join('<br>');
+  
+  // 更新统计
+  const totalItems = selectedIds.size;
+  const annotatorCount = annotators.length;
+  const average = Math.ceil(totalItems / annotatorCount);
+  
+  document.getElementById('statsTotal').textContent = totalItems;
+  document.getElementById('statsAnnotatorCount').textContent = annotatorCount;
+  document.getElementById('statsAverage').textContent = average;
+  
+  // 更新分发预览
+  const itemsPerPerson = Math.floor(totalItems / annotatorCount);
+  const remainder = totalItems % annotatorCount;
+  
+  let html = '<div class="space-y-2">';
+  annotators.forEach((annotator, index) => {
+    const count = itemsPerPerson + (index < remainder ? 1 : 0);
+    html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
+      <span class="text-gray-700">${annotator.name}</span>
+      <span class="text-blue-600 font-medium">${count} 条数据</span>
+    </div>`;
+  });
+  html += '</div>';
+  
+  document.getElementById('previewContent').innerHTML = html;
+}
+
+// 标注员下拉菜单
+const userDropdownMenu = document.getElementById('userDropdownMenu');
+
+// 点击搜索框时显示下拉菜单
+document.getElementById('userSearchInput').addEventListener('click', function(e) {
+  e.stopPropagation();
+  userDropdownMenu.classList.remove('hidden');
+});
+
+// 标注员模糊搜索
+document.getElementById('userSearchInput').addEventListener('input', function(e) {
+  e.stopPropagation();
+  const searchValue = this.value.toLowerCase();
+  const userItems = document.querySelectorAll('.user-item');
+  userItems.forEach(item => {
+    const userName = item.dataset.userName.toLowerCase();
+    const displayText = item.querySelector('span').textContent.toLowerCase();
+    if (userName.includes(searchValue) || displayText.includes(searchValue)) {
+      item.style.display = '';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+});
+
+// 点击下拉菜单内部不关闭
+userDropdownMenu.addEventListener('click', function(e) {
+  e.stopPropagation();
+});
+
+// 全选标注员（基于模糊搜索结果）
+document.getElementById('selectAllUsers').addEventListener('click', function(e) {
+  e.stopPropagation();
+  const userItems = document.querySelectorAll('.user-item');
+  const visibleItems = Array.from(userItems).filter(item => item.style.display !== 'none');
+  const allSelected = visibleItems.every(item => item.querySelector('i').classList.contains('selected'));
+  
+  visibleItems.forEach(item => {
+    const icon = item.querySelector('i');
+    if (allSelected) {
+      icon.classList.add('hidden');
+      icon.classList.remove('selected');
+    } else {
+      icon.classList.remove('hidden');
+      icon.classList.add('selected');
+    }
+  });
+  updateAnnotatorPreview();
+});
+
+// 标注员点击选择
+document.querySelectorAll('.user-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const icon = this.querySelector('i');
+    if (icon.classList.contains('selected')) {
+      icon.classList.add('hidden');
+      icon.classList.remove('selected');
+    } else {
+      icon.classList.remove('hidden');
+      icon.classList.add('selected');
+    }
+    updateAnnotatorPreview();
+  });
+});
+
+// 点击其他区域关闭下拉菜单
+document.addEventListener('click', function(e) {
+  const target = e.target;
+  if (userDropdownMenu.contains(target)) {
+    return;
+  }
+  userDropdownMenu.classList.add('hidden');
+  batchOperationMenu.classList.add('hidden');
+  document.getElementById('inspectionGroupDropdownMenu').classList.add('hidden');
+  document.getElementById('inspectionUserDropdownMenu').classList.add('hidden');
+});
+
+// 阻止批量操作菜单内点击事件冒泡
+batchOperationMenu.addEventListener('click', function(e) {
+  e.stopPropagation();
+});
+
+
+</script>
 </body>
 </html>

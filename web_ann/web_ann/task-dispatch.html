@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>任务下发 - 标注管理平台</title>
+<title>数据管理-MWV - 数据标注平台</title>
 <link href="https://static.mastergo.com/static/ai/resource/html/googleapis/css2" rel="stylesheet">
 <link href="https://static.mastergo.com/static/ai/resource/html/font-awesome/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
@@ -154,11 +154,11 @@ i {
   <div class="mt-4">
     <a href="./index.html" class="px-4 py-2 hover:bg-gray-200 cursor-pointer block">
       <i class="fas fa-pen mr-2"></i>
-      <span>标注管理</span>
+      <span>数据标注</span>
     </a>
     <div class="px-4 py-2 bg-sidebar_primary text-sidebar_primary_foreground cursor-pointer">
       <i class="fas fa-check-circle mr-2"></i>
-      <span>任务下发</span>
+      <span>数据管理-MWV</span>
     </div>
   </div>
   <div class="absolute bottom-0 w-full p-4 border-t border-gray-300">
@@ -177,7 +177,7 @@ i {
   <div class="h-16 bg-card shadow-sm flex items-center justify-between px-6">
     <div class="text-muted_foreground">
       <i class="fas fa-home mr-2"></i>
-      <span>首页 / 任务下发</span>
+      <span>首页 / 数据管理-MWV</span>
     </div>
     <div class="flex items-center">
       <i class="fas fa-bell text-muted_foreground mr-4 cursor-pointer"></i>
@@ -187,20 +187,23 @@ i {
     </div>
   </div>
 
-  <!-- 任务下发内容 -->
+  <!-- 数据管理-MWV内容 -->
   <div class="p-6">
     <!-- 搜索区域 -->
     <div class="card p-4 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div class="relative">
-          <label class="block text-sm font-medium text-muted_foreground mb-1">标注状态</label>
+          <label class="block text-sm font-medium text-muted_foreground mb-1">切割状态</label>
           <select id="statusFilter" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
             <option value="">全部</option>
-            <option value="waiting">待标注</option>
-            <option value="processing">进行中</option>
-            <option value="completed">已标注</option>
-            <option value="passed">质检通过</option>
-            <option value="failed">质检失败</option>
+            <option value="waiting">初始</option>
+            <option value="processing">待审核</option>
+            <option value="processing">初审通过</option>
+            <option value="processing">初审拒绝</option>
+            <option value="processing">终审通过</option>
+            <option value="processing">终审拒绝</option>
+            <option value="completed">终审暂存</option>
+            <option value="passed">已发布</option>
           </select>
         </div>
         <div class="relative">
@@ -223,6 +226,23 @@ i {
         <div class="relative">
           <label class="block text-sm font-medium text-muted_foreground mb-1">数据UUID</label>
           <input type="text" id="uuidFilter" placeholder="请输入数据UUID" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">采集席位</label>
+          <select id="seatFilter" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <option value="">全部</option>
+            <option value="seat1">seat1</option>
+            <option value="seat2">seat2</option>
+            <option value="seat3">seat3</option>
+          </select>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">切割账号</label>
+          <input type="text" id="cutAccountFilter" placeholder="请输入切割账号" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-muted_foreground mb-1">初审账号</label>
+          <input type="text" id="reviewAccountFilter" placeholder="请输入初审账号" class="w-full pl-4 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
         </div>
       </div>
       <div class="flex justify-end">
@@ -263,6 +283,9 @@ i {
             <button onclick="openQualityPanel()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
               质检下发
             </button>
+            <button onclick="openRandomInspectionPanel()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+              随机抽检
+            </button>
           </div>
         </div>
       </div>
@@ -280,7 +303,7 @@ i {
               <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">UUID</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">采集时间</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">数据集</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">标注状态</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted_foreground uppercase tracking-wider">切割状态</th>
             </tr>
           </thead>
           <tbody id="dataTable" class="bg-card divide-y divide-border">
@@ -301,12 +324,12 @@ i {
 <!-- 遮罩层 -->
 <div id="overlay" class="overlay"></div>
 
-<!-- 任务下发侧滑窗 -->
+<!-- 数据管理-MWV侧滑窗 -->
 <div id="dispatchPanel" class="side-panel">
   <div class="h-full flex flex-col">
     <!-- 头部 -->
     <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-      <h2 class="text-lg font-medium text-gray-900">任务下发</h2>
+      <h2 class="text-lg font-medium text-gray-900">数据管理-MWV</h2>
       <button onclick="closeDispatchPanel()" class="text-gray-400 hover:text-gray-600">
         <i class="fas fa-times"></i>
       </button>
@@ -322,116 +345,62 @@ i {
         </div>
       </div>
 
-      <!-- 分发方式 -->
+      <!-- 选择切割员 -->
       <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-3">打包方式</label>
-        <div class="space-y-3">
-          <label class="flex items-center space-x-3 cursor-pointer">
-            <input type="radio" name="dispatchType" value="even" checked onchange="handleDispatchTypeChange()" class="w-4 h-4 text-blue-600">
-            <span class="text-sm text-gray-700">均匀分发</span>
-          </label>
-          <label class="flex items-center space-x-3 cursor-pointer">
-            <input type="radio" name="dispatchType" value="fixed" onchange="handleDispatchTypeChange()" class="w-4 h-4 text-blue-600">
-            <span class="text-sm text-gray-700">按固定量打包</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- 固定大小输入（仅当选择固定大小时显示） -->
-      <div id="fixedSizeSection" class="mb-6 hidden">
-        <label class="block text-sm font-medium text-gray-700 mb-2">每个数据包大小</label>
-        <input type="number" id="packageSize" value="20" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="calculatePackages()">
-        <p class="mt-2 text-xs text-gray-500">
-          将生成 <span id="packageCount" class="font-medium text-blue-600">0</span> 个数据包
-        </p>
-      </div>
-
-      <!-- 选择标注员或标注组 -->
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-3">选择标注员或标注组</label>
+        <label class="block text-sm font-medium text-gray-700 mb-3">选择切割员</label>
         
-        <!-- Tab 切换 -->
-        <div class="border-b border-gray-200 mb-4">
-          <div class="flex space-x-8">
-            <button onclick="switchTab('group')" id="groupTab" class="py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium">标注组</button>
-            <button onclick="switchTab('user')" id="userTab" class="py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">标注员</button>
-          </div>
-        </div>
-        
-        <!-- 标注组 Tab -->
-        <div id="groupContent" class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">选择标注组</label>
-          <div id="groupDropdown" class="w-full">
-            <button id="groupDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
-              <span id="groupSelectedText">请选择标注组</span>
-              <i class="fas fa-chevron-down"></i>
-            </button>
-            <div id="groupDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-              <div class="p-2">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs text-gray-500">标注组列表</span>
-                  <button id="selectAllGroups" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+        <div class="w-full relative">
+          <!-- 搜索框始终显示 -->
+          <input type="text" id="userSearchInput" placeholder="搜索切割员..." class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <!-- 切割员列表下拉 -->
+          <div id="userDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-button shadow-lg">
+            <div class="border-t border-gray-200">
+              <div class="p-2 border-b border-gray-200 flex justify-between items-center">
+                <span class="text-xs text-gray-500">切割员列表</span>
+                <button id="selectAllUsers" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+              </div>
+              <div id="userListContainer" class="max-h-48 overflow-y-auto">
+                <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_1" data-user-name="张三">
+                  <span>jutingting</span>
+                  <i class="fas fa-check text-blue-500 hidden"></i>
                 </div>
-                <div class="space-y-1">
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="group_1" value="group_1" data-name="标注组A" data-count="5" class="group-checkbox mr-2">
-                    <span>标注组A (5人)</span>
-                  </div>
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="group_2" value="group_2" data-name="标注组B" data-count="3" class="group-checkbox mr-2">
-                    <span>标注组B (3人)</span>
-                  </div>
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="group_3" value="group_3" data-name="标注组C" data-count="4" class="group-checkbox mr-2">
-                    <span>标注组C (4人)</span>
-                  </div>
+                <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_2" data-user-name="李四">
+                  <span>lisi</span>
+                  <i class="fas fa-check text-blue-500 hidden"></i>
+                </div>
+                <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_3" data-user-name="王五">
+                  <span>xiaoan</span>
+                  <i class="fas fa-check text-blue-500 hidden"></i>
+                </div>
+                <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_4" data-user-name="赵六">
+                  <span>qianqiqi</span>
+                  <i class="fas fa-check text-blue-500 hidden"></i>
+                </div>
+                <div class="user-item flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer" data-user-id="user_5" data-user-name="钱七">
+                  <span>liming</span>
+                  <i class="fas fa-check text-blue-500 hidden"></i>
                 </div>
               </div>
             </div>
           </div>
-          <p class="mt-2 text-xs text-gray-500">可多选标注组</p>
         </div>
+        <p class="mt-2 text-xs text-gray-500">点击搜索框展开切割员列表</p>
+      </div>
 
-        <!-- 标注员 Tab -->
-        <div id="userContent" class="mb-4 hidden">
-          <label class="block text-sm font-medium text-gray-700 mb-2">选择标注员</label>
-          <div id="userDropdown" class="w-full">
-            <button id="userDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
-              <span id="userSelectedText">请选择标注员</span>
-              <i class="fas fa-chevron-down"></i>
-            </button>
-            <div id="userDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-              <div class="p-2">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs text-gray-500">标注员列表</span>
-                  <button id="selectAllUsers" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
-                </div>
-                <div class="space-y-1">
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="user_1" value="user_1" data-name="张三" class="user-checkbox mr-2">
-                    <span>张三</span>
-                  </div>
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="user_2" value="user_2" data-name="李四" class="user-checkbox mr-2">
-                    <span>李四</span>
-                  </div>
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="user_3" value="user_3" data-name="王五" class="user-checkbox mr-2">
-                    <span>王五</span>
-                  </div>
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="user_4" value="user_4" data-name="赵六" class="user-checkbox mr-2">
-                    <span>赵六</span>
-                  </div>
-                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
-                    <input type="checkbox" id="user_5" value="user_5" data-name="钱七" class="user-checkbox mr-2">
-                    <span>钱七</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="mt-2 text-xs text-gray-500">可多选标注员</p>
+      <!-- 所选切割员名单预览 -->
+      <div id="selectedAnnotatorsPreview" class="mb-6 hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-3">所选切割员名单</label>
+        <div id="selectedAnnotatorsList" class="border border-gray-200 rounded-lg p-3 max-h-32 overflow-y-auto text-sm bg-gray-50">
+        </div>
+      </div>
+
+      <!-- 自动计算提示 -->
+      <div id="dispatchStats" class="mb-6 p-4 bg-green-50 rounded-lg hidden">
+        <div class="text-sm text-green-700 space-y-1">
+          <div>数据总量：<span id="statsTotal" class="font-medium">0</span> 条</div>
+          <div>已选切割员：<span id="statsAnnotatorCount" class="font-medium">0</span> 人</div>
+          <div>每人平均标注量：<span id="statsAverage" class="font-medium">0</span> 条</div>
+          <div class="mt-2 text-xs">数据将均匀下发</div>
         </div>
       </div>
 
@@ -596,6 +565,138 @@ i {
       </button>
       <button onclick="handleQualityDispatch()" id="confirmQualityDispatchBtn" disabled class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
         确认下发
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 随机抽检侧滑窗 -->
+<div id="randomInspectionPanel" class="side-panel">
+  <div class="h-full flex flex-col">
+    <!-- 头部 -->
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="text-lg font-medium text-gray-900">随机抽检</h2>
+      <button onclick="closeRandomInspectionPanel()" class="text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- 已选数据统计 -->
+      <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="text-sm text-blue-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          已选择 <span id="inspectionPanelSelectedCount" class="font-medium">0</span> 条数据待抽检
+        </div>
+      </div>
+
+      <!-- 抽检比例 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">抽检比例</label>
+        <div class="relative">
+          <input type="number" id="inspectionRatio" value="10" min="1" max="100" class="w-full pr-12 px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+        </div>
+        <p class="mt-2 text-xs text-gray-500">
+          将从选中数据中随机抽取 <span id="inspectionCount" class="font-medium text-blue-600">0</span> 条数据
+        </p>
+      </div>
+
+      <!-- 批数量 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">批数量</label>
+        <input type="number" id="inspectionBatchCount" value="1" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <p class="mt-2 text-xs text-gray-500">
+          将抽检数据分为多少批数据批次，默认为1表示生成一批抽检数据列表
+        </p>
+      </div>
+
+      <!-- 选择抽检员或抽检组 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">选择分配账号或组别</label>
+        
+        <!-- Tab 切换 -->
+        <div class="border-b border-gray-200 mb-4">
+          <div class="flex space-x-8">
+            <button onclick="switchInspectionTab('inspectionGroup')" id="inspectionGroupTab" class="py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium">抽检组</button>
+            <button onclick="switchInspectionTab('inspectionUser')" id="inspectionUserTab" class="py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700">抽检员</button>
+          </div>
+        </div>
+        
+        <!-- 抽检组 Tab -->
+        <div id="inspectionGroupContent" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">选择抽检组</label>
+          <div id="inspectionGroupDropdown" class="w-full">
+            <button id="inspectionGroupDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+              <span id="inspectionGroupSelectedText">请选择抽检组</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="inspectionGroupDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div class="p-2">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs text-gray-500">抽检组列表</span>
+                  <button id="selectAllInspectionGroups" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="inspection_group_1" value="inspection_group_1" data-name="抽检组A" data-count="3" class="inspection-group-checkbox mr-2">
+                    <span>抽检组A (3人)</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="inspection_group_2" value="inspection_group_2" data-name="抽检组B" data-count="2" class="inspection-group-checkbox mr-2">
+                    <span>抽检组B (2人)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">可多选抽检组</p>
+        </div>
+
+        <!-- 抽检员 Tab -->
+        <div id="inspectionUserContent" class="mb-4 hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2">选择抽检员</label>
+          <div id="inspectionUserDropdown" class="w-full">
+            <button id="inspectionUserDropdownButton" class="w-full px-4 py-2 border border-gray-300 rounded-button text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center">
+              <span id="inspectionUserSelectedText">请选择抽检员</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="inspectionUserDropdownMenu" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div class="p-2">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs text-gray-500">抽检员列表</span>
+                  <button id="selectAllInspectionUsers" class="text-xs text-blue-500 hover:text-blue-700">全选</button>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="inspection_user_1" value="inspection_user_1" data-name="抽检员1" class="inspection-user-checkbox mr-2">
+                    <span>抽检员1</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="inspection_user_2" value="inspection_user_2" data-name="抽检员2" class="inspection-user-checkbox mr-2">
+                    <span>抽检员2</span>
+                  </div>
+                  <div class="flex items-center px-2 py-1 hover:bg-gray-100">
+                    <input type="checkbox" id="inspection_user_3" value="inspection_user_3" data-name="抽检员3" class="inspection-user-checkbox mr-2">
+                    <span>抽检员3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">可多选抽检员</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+      <button onclick="closeRandomInspectionPanel()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50">
+        取消
+      </button>
+      <button onclick="handleRandomInspection()" id="confirmInspectionBtn" disabled class="px-6 py-2 bg-blue-500 text-white rounded-button hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+        确认抽检
       </button>
     </div>
   </div>
@@ -838,12 +939,35 @@ function openDispatchPanel() {
   document.getElementById('dispatchPanel').classList.add('open');
   document.getElementById('panelSelectedCount').textContent = selectedIds.size;
   calculatePackages();
+  // 初始化预览
+  updateSelectedAnnotatorsPreview();
 }
 
 // 关闭下发面板
 function closeDispatchPanel() {
   document.getElementById('overlay').classList.remove('show');
   document.getElementById('dispatchPanel').classList.remove('open');
+  document.getElementById('userDropdownMenu').classList.add('hidden');
+}
+
+// 切割员下拉框展开/收起
+function toggleUserDropdown() {
+  const menu = document.getElementById('userDropdownMenu');
+  menu.classList.toggle('hidden');
+}
+
+// 切割员选择切换
+function toggleUserSelection(item) {
+  const icon = item.querySelector('i');
+  if (icon.classList.contains('selected')) {
+    icon.classList.add('hidden');
+    icon.classList.remove('selected');
+  } else {
+    icon.classList.remove('hidden');
+    icon.classList.add('selected');
+  }
+  updateUserSelectedText();
+  handleAnnotatorChange();
 }
 
 // 打开质检下发面板
@@ -860,42 +984,53 @@ function closeQualityPanel() {
   document.getElementById('qualityPanel').classList.remove('open');
 }
 
-// 分发方式改变
-function handleDispatchTypeChange() {
-  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
-  const fixedSizeSection = document.getElementById('fixedSizeSection');
-  
-  if (dispatchType === 'fixed') {
-    fixedSizeSection.classList.remove('hidden');
-  } else {
-    fixedSizeSection.classList.add('hidden');
-  }
-  
-  calculatePackages();
-}
-
-// 计算数据包
-function calculatePackages() {
-  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
-  const packageSize = parseInt(document.getElementById('packageSize').value) || 1;
-  const totalItems = selectedIds.size;
-  
-  if (dispatchType === 'fixed') {
-    const packageCount = Math.ceil(totalItems / packageSize);
-    document.getElementById('packageCount').textContent = packageCount;
-  }
-  
-  updateDispatchPreview();
-}
-
-// 标注员选择改变
+// 切割员选择改变
 function handleAnnotatorChange() {
+  updateSelectedAnnotatorsPreview();
+  updateDispatchStats();
   updateDispatchPreview();
+}
+
+// 更新所选切割员名单预览
+function updateSelectedAnnotatorsPreview() {
+  const annotators = getSelectedAnnotators();
+  const previewSection = document.getElementById('selectedAnnotatorsPreview');
+  const previewList = document.getElementById('selectedAnnotatorsList');
+  
+  if (annotators.length === 0) {
+    previewSection.classList.add('hidden');
+    return;
+  }
+  
+  previewSection.classList.remove('hidden');
+  
+  const names = annotators.map(a => a.name);
+  previewList.innerHTML = names.join('<br>');
+}
+
+// 更新分发统计信息
+function updateDispatchStats() {
+  const annotators = getSelectedAnnotators();
+  const statsSection = document.getElementById('dispatchStats');
+  const totalItems = selectedIds.size;
+  const annotatorCount = annotators.length;
+  
+  if (annotatorCount === 0) {
+    statsSection.classList.add('hidden');
+    return;
+  }
+  
+  statsSection.classList.remove('hidden');
+  
+  const average = Math.ceil(totalItems / annotatorCount);
+  
+  document.getElementById('statsTotal').textContent = totalItems;
+  document.getElementById('statsAnnotatorCount').textContent = annotatorCount;
+  document.getElementById('statsAverage').textContent = average;
 }
 
 // 更新分发预览
 function updateDispatchPreview() {
-  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
   const annotators = getSelectedAnnotators();
   const previewSection = document.getElementById('dispatchPreview');
   const previewContent = document.getElementById('previewContent');
@@ -913,78 +1048,30 @@ function updateDispatchPreview() {
   const totalItems = selectedIds.size;
   const annotatorCount = annotators.length;
   
-  let html = '';
+  const itemsPerPerson = Math.floor(totalItems / annotatorCount);
+  const remainder = totalItems % annotatorCount;
   
-  if (dispatchType === 'even') {
-    const itemsPerPerson = Math.floor(totalItems / annotatorCount);
-    const remainder = totalItems % annotatorCount;
-    
-    html = '<div class="space-y-2">';
-    annotators.forEach((annotator, index) => {
-      const count = itemsPerPerson + (index < remainder ? 1 : 0);
-      html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
-        <span class="text-gray-700">${annotator.name}</span>
-        <span class="text-blue-600 font-medium">${count} 条数据</span>
-      </div>`;
-    });
-    html += '</div>';
-  } else {
-    const packageSize = parseInt(document.getElementById('packageSize').value) || 1;
-    const packageCount = Math.ceil(totalItems / packageSize);
-    const packagesPerPerson = Math.floor(packageCount / annotatorCount);
-    const remainder = packageCount % annotatorCount;
-    
-    html = '<div class="space-y-2">';
-    html += `<div class="text-gray-500 mb-2">共 ${packageCount} 个数据包</div>`;
-    annotators.forEach((annotator, index) => {
-      const count = packagesPerPerson + (index < remainder ? 1 : 0);
-      html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
-        <span class="text-gray-700">${annotator.name}</span>
-        <span class="text-blue-600 font-medium">${count} 个数据包</span>
-      </div>`;
-    });
-    html += '</div>';
-  }
+  let html = '<div class="space-y-2">';
+  annotators.forEach((annotator, index) => {
+    const count = itemsPerPerson + (index < remainder ? 1 : 0);
+    html += `<div class="flex justify-between items-center py-1 border-b border-gray-100">
+      <span class="text-gray-700">${annotator.name}</span>
+      <span class="text-blue-600 font-medium">${count} 条数据</span>
+    </div>`;
+  });
+  html += '</div>';
   
   previewContent.innerHTML = html;
-}
-
-// Tab 切换
-function switchTab(tab) {
-  if (tab === 'group') {
-    document.getElementById('groupTab').classList.add('border-blue-500', 'text-blue-600');
-    document.getElementById('groupTab').classList.remove('border-transparent', 'text-gray-500');
-    document.getElementById('userTab').classList.add('border-transparent', 'text-gray-500');
-    document.getElementById('userTab').classList.remove('border-blue-500', 'text-blue-600');
-    document.getElementById('groupContent').classList.remove('hidden');
-    document.getElementById('userContent').classList.add('hidden');
-  } else {
-    document.getElementById('userTab').classList.add('border-blue-500', 'text-blue-600');
-    document.getElementById('userTab').classList.remove('border-transparent', 'text-gray-500');
-    document.getElementById('groupTab').classList.add('border-transparent', 'text-gray-500');
-    document.getElementById('groupTab').classList.remove('border-blue-500', 'text-blue-600');
-    document.getElementById('userContent').classList.remove('hidden');
-    document.getElementById('groupContent').classList.add('hidden');
-  }
-  handleAnnotatorChange();
 }
 
 
 
 // 确认下发
 function handleDispatch() {
-  const dispatchType = document.querySelector('input[name="dispatchType"]:checked').value;
   const annotators = getSelectedAnnotators();
   const totalItems = selectedIds.size;
   
-  let message = '';
-  if (dispatchType === 'even') {
-    message = `已将 ${totalItems} 条数据均匀分发给 ${annotators.length} 个标注员/组`;
-  } else {
-    const packageSize = parseInt(document.getElementById('packageSize').value) || 1;
-    const packageCount = Math.ceil(totalItems / packageSize);
-    message = `已将 ${totalItems} 条数据打包成 ${packageCount} 个数据包，分发给 ${annotators.length} 个标注员/组`;
-  }
+  const message = `已将 ${totalItems} 条数据均匀分发给 ${annotators.length} 个切割员`;
   
   alert(message);
   closeDispatchPanel();
@@ -1023,7 +1110,7 @@ function calculateQualityPackages() {
   updateQualityDispatchPreview();
 }
 
-// 质检标注员选择改变
+// 质检切割员选择改变
 function handleQualityAnnotatorChange() {
   updateQualityDispatchPreview();
 }
@@ -1128,6 +1215,138 @@ function handleQualityDispatch() {
   renderTable();
 }
 
+// 打开随机抽检面板
+function openRandomInspectionPanel() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('randomInspectionPanel').classList.add('open');
+  document.getElementById('inspectionPanelSelectedCount').textContent = selectedIds.size;
+  calculateInspectionCount();
+}
+
+// 关闭随机抽检面板
+function closeRandomInspectionPanel() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('randomInspectionPanel').classList.remove('open');
+}
+
+// 计算抽检数量
+function calculateInspectionCount() {
+  const ratio = parseInt(document.getElementById('inspectionRatio').value) || 10;
+  const totalItems = selectedIds.size;
+  const inspectionCount = Math.ceil(totalItems * ratio / 100);
+  document.getElementById('inspectionCount').textContent = inspectionCount;
+  
+  updateInspectionConfirmButton();
+}
+
+// 抽检Tab切换
+function switchInspectionTab(tab) {
+  if (tab === 'inspectionGroup') {
+    document.getElementById('inspectionGroupTab').classList.add('border-blue-500', 'text-blue-600');
+    document.getElementById('inspectionGroupTab').classList.remove('border-transparent', 'text-gray-500');
+    document.getElementById('inspectionUserTab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('inspectionUserTab').classList.remove('border-blue-500', 'text-blue-600');
+    document.getElementById('inspectionGroupContent').classList.remove('hidden');
+    document.getElementById('inspectionUserContent').classList.add('hidden');
+  } else {
+    document.getElementById('inspectionUserTab').classList.add('border-blue-500', 'text-blue-600');
+    document.getElementById('inspectionUserTab').classList.remove('border-transparent', 'text-gray-500');
+    document.getElementById('inspectionGroupTab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('inspectionGroupTab').classList.remove('border-blue-500', 'text-blue-600');
+    document.getElementById('inspectionUserContent').classList.remove('hidden');
+    document.getElementById('inspectionGroupContent').classList.add('hidden');
+  }
+  updateInspectionConfirmButton();
+}
+
+// 更新抽检确认按钮状态
+function updateInspectionConfirmButton() {
+  const inspectors = getSelectedInspectors();
+  const confirmBtn = document.getElementById('confirmInspectionBtn');
+  
+  if (inspectors.length === 0) {
+    confirmBtn.disabled = true;
+  } else {
+    confirmBtn.disabled = false;
+  }
+}
+
+// 获取选中的抽检员
+function getSelectedInspectors() {
+  const inspectors = [];
+  
+  // 获取选中的抽检组
+  document.querySelectorAll('.inspection-group-checkbox:checked').forEach(checkbox => {
+    inspectors.push({
+      type: 'inspectionGroup',
+      id: checkbox.value,
+      name: checkbox.dataset.name,
+      count: checkbox.dataset.count ? parseInt(checkbox.dataset.count) : 1
+    });
+  });
+  
+  // 获取选中的抽检员
+  document.querySelectorAll('.inspection-user-checkbox:checked').forEach(checkbox => {
+    inspectors.push({
+      type: 'inspectionUser',
+      id: checkbox.value,
+      name: checkbox.dataset.name,
+      count: 1
+    });
+  });
+  
+  return inspectors;
+}
+
+// 确认随机抽检
+function handleRandomInspection() {
+  const ratio = parseInt(document.getElementById('inspectionRatio').value) || 10;
+  const batchCount = parseInt(document.getElementById('inspectionBatchCount').value) || 1;
+  const inspectors = getSelectedInspectors();
+  const totalItems = selectedIds.size;
+  const inspectionCount = Math.ceil(totalItems * ratio / 100);
+  
+  let message = `已从 ${totalItems} 条数据中随机抽取 ${inspectionCount} 条（比例 ${ratio}%），打包成 ${batchCount} 个批次，分发给 ${inspectors.length} 个抽检员/组`;
+  
+  alert(message);
+  closeRandomInspectionPanel();
+  
+  // 清空选择
+  selectedIds.clear();
+  updateSelectedInfo();
+  renderTable();
+}
+
+// 更新抽检组选择文本
+function updateInspectionGroupSelectedText() {
+  const checkboxes = document.querySelectorAll('.inspection-group-checkbox:checked');
+  const selectedCount = checkboxes.length;
+  const selectedText = document.getElementById('inspectionGroupSelectedText');
+  
+  if (selectedCount === 0) {
+    selectedText.textContent = '请选择抽检组';
+  } else if (selectedCount === 2) {
+    selectedText.textContent = '全部抽检组';
+  } else {
+    selectedText.textContent = `已选择 ${selectedCount} 个抽检组`;
+  }
+}
+
+// 更新抽检员选择文本
+function updateInspectionUserSelectedText() {
+  const checkboxes = document.querySelectorAll('.inspection-user-checkbox:checked');
+  const selectedCount = checkboxes.length;
+  const selectedText = document.getElementById('inspectionUserSelectedText');
+  
+  if (selectedCount === 0) {
+    selectedText.textContent = '请选择抽检员';
+  } else if (selectedCount === 3) {
+    selectedText.textContent = '全部抽检员';
+  } else {
+    selectedText.textContent = `已选择 ${selectedCount} 个抽检员`;
+  }
+}
+
 // 获取选中的质检员
 function getSelectedQualityAnnotators() {
   const annotators = [];
@@ -1172,55 +1391,71 @@ function initDropdowns() {
     batchOperationMenu.classList.toggle('hidden');
   });
   
-  // 标注组下拉菜单
-  const groupDropdownButton = document.getElementById('groupDropdownButton');
-  const groupDropdownMenu = document.getElementById('groupDropdownMenu');
-  
-  groupDropdownButton.addEventListener('click', function(e) {
-    e.stopPropagation();
-    groupDropdownMenu.classList.toggle('hidden');
-    document.getElementById('userDropdownMenu').classList.add('hidden');
-  });
-  
   // 标注员下拉菜单
-  const userDropdownButton = document.getElementById('userDropdownButton');
   const userDropdownMenu = document.getElementById('userDropdownMenu');
   
-  userDropdownButton.addEventListener('click', function(e) {
+  // 点击搜索框时显示下拉菜单
+  document.getElementById('userSearchInput').addEventListener('click', function(e) {
     e.stopPropagation();
-    userDropdownMenu.classList.toggle('hidden');
-    document.getElementById('groupDropdownMenu').classList.add('hidden');
+    userDropdownMenu.classList.remove('hidden');
   });
   
-  // 全选标注组
-  document.getElementById('selectAllGroups').addEventListener('click', function() {
-    const checkboxes = document.querySelectorAll('.group-checkbox');
-    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-    checkboxes.forEach(cb => cb.checked = !allChecked);
-    updateGroupSelectedText();
-    handleAnnotatorChange();
+  // 标注员模糊搜索
+  document.getElementById('userSearchInput').addEventListener('input', function(e) {
+    e.stopPropagation();
+    const searchValue = this.value.toLowerCase();
+    const userItems = document.querySelectorAll('.user-item');
+    userItems.forEach(item => {
+      const userName = item.dataset.userName.toLowerCase();
+      // 模糊搜索：匹配名字或显示文本
+      const displayText = item.querySelector('span').textContent.toLowerCase();
+      if (userName.includes(searchValue) || displayText.includes(searchValue)) {
+        item.style.display = '';
+      } else {
+        item.style.display = 'none';
+      }
+    });
   });
   
-  // 全选标注员
-  document.getElementById('selectAllUsers').addEventListener('click', function() {
-    const checkboxes = document.querySelectorAll('.user-checkbox');
-    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-    checkboxes.forEach(cb => cb.checked = !allChecked);
+  // 点击下拉菜单内部不关闭
+  userDropdownMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  // 全选标注员（基于模糊搜索结果）
+  document.getElementById('selectAllUsers').addEventListener('click', function(e) {
+    e.stopPropagation();
+    const userItems = document.querySelectorAll('.user-item');
+    // 只对当前可见的（搜索结果中的）标注员进行操作
+    const visibleItems = Array.from(userItems).filter(item => item.style.display !== 'none');
+    const allSelected = visibleItems.every(item => item.querySelector('i').classList.contains('selected'));
+    
+    visibleItems.forEach(item => {
+      const icon = item.querySelector('i');
+      if (allSelected) {
+        icon.classList.add('hidden');
+        icon.classList.remove('selected');
+      } else {
+        icon.classList.remove('hidden');
+        icon.classList.add('selected');
+      }
+    });
     updateUserSelectedText();
     handleAnnotatorChange();
   });
   
-  // 标注组复选框变化
-  document.querySelectorAll('.group-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      updateGroupSelectedText();
-      handleAnnotatorChange();
-    });
-  });
-  
-  // 标注员复选框变化
-  document.querySelectorAll('.user-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
+  // 标注员点击选择
+  document.querySelectorAll('.user-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const icon = this.querySelector('i');
+      if (icon.classList.contains('selected')) {
+        icon.classList.add('hidden');
+        icon.classList.remove('selected');
+      } else {
+        icon.classList.remove('hidden');
+        icon.classList.add('selected');
+      }
       updateUserSelectedText();
       handleAnnotatorChange();
     });
@@ -1280,13 +1515,82 @@ function initDropdowns() {
     });
   });
   
+  // 抽检比例变化（实时更新）
+  document.getElementById('inspectionRatio').addEventListener('input', function() {
+    calculateInspectionCount();
+  });
+  document.getElementById('inspectionRatio').addEventListener('change', function() {
+    calculateInspectionCount();
+  });
+  
+  // 抽检组下拉菜单
+  const inspectionGroupDropdownButton = document.getElementById('inspectionGroupDropdownButton');
+  const inspectionGroupDropdownMenu = document.getElementById('inspectionGroupDropdownMenu');
+  
+  inspectionGroupDropdownButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    inspectionGroupDropdownMenu.classList.toggle('hidden');
+    document.getElementById('inspectionUserDropdownMenu').classList.add('hidden');
+  });
+  
+  // 抽检员下拉菜单
+  const inspectionUserDropdownButton = document.getElementById('inspectionUserDropdownButton');
+  const inspectionUserDropdownMenu = document.getElementById('inspectionUserDropdownMenu');
+  
+  inspectionUserDropdownButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    inspectionUserDropdownMenu.classList.toggle('hidden');
+    document.getElementById('inspectionGroupDropdownMenu').classList.add('hidden');
+  });
+  
+  // 全选抽检组
+  document.getElementById('selectAllInspectionGroups').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.inspection-group-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    updateInspectionGroupSelectedText();
+    updateInspectionConfirmButton();
+  });
+  
+  // 全选抽检员
+  document.getElementById('selectAllInspectionUsers').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.inspection-user-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    updateInspectionUserSelectedText();
+    updateInspectionConfirmButton();
+  });
+  
+  // 抽检组复选框变化
+  document.querySelectorAll('.inspection-group-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateInspectionGroupSelectedText();
+      updateInspectionConfirmButton();
+    });
+  });
+  
+  // 抽检员复选框变化
+  document.querySelectorAll('.inspection-user-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      updateInspectionUserSelectedText();
+      updateInspectionConfirmButton();
+    });
+  });
+  
   // 点击其他区域关闭下拉菜单
-  document.addEventListener('click', function() {
+  document.addEventListener('click', function(e) {
+    const target = e.target;
+    // 如果点击的是userDropdownMenu内部，不关闭
+    if (userDropdownMenu.contains(target)) {
+      return;
+    }
+    userDropdownMenu.classList.add('hidden');
     batchOperationMenu.classList.add('hidden');
     groupDropdownMenu.classList.add('hidden');
-    userDropdownMenu.classList.add('hidden');
     qualityGroupDropdownMenu.classList.add('hidden');
     qualityUserDropdownMenu.classList.add('hidden');
+    inspectionGroupDropdownMenu.classList.add('hidden');
+    inspectionUserDropdownMenu.classList.add('hidden');
   });
   
   // 阻止下拉菜单内点击事件冒泡
@@ -1307,6 +1611,14 @@ function initDropdowns() {
   });
   
   qualityUserDropdownMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  inspectionGroupDropdownMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  inspectionUserDropdownMenu.addEventListener('click', function(e) {
     e.stopPropagation();
   });
 }
@@ -1341,56 +1653,35 @@ function updateQualityUserSelectedText() {
   }
 }
 
-// 更新标注组选择文本
-function updateGroupSelectedText() {
-  const checkboxes = document.querySelectorAll('.group-checkbox:checked');
-  const selectedCount = checkboxes.length;
-  const selectedText = document.getElementById('groupSelectedText');
-  
-  if (selectedCount === 0) {
-    selectedText.textContent = '请选择标注组';
-  } else if (selectedCount === 3) {
-    selectedText.textContent = '全部标注组';
-  } else {
-    selectedText.textContent = `已选择 ${selectedCount} 个标注组`;
-  }
-}
-
-// 更新标注员选择文本
+// 更新切割员选择文本
 function updateUserSelectedText() {
-  const checkboxes = document.querySelectorAll('.user-checkbox:checked');
-  const selectedCount = checkboxes.length;
+  const selectedItems = document.querySelectorAll('.user-item i.selected');
+  const selectedCount = selectedItems.length;
   const selectedText = document.getElementById('userSelectedText');
   
-  if (selectedCount === 0) {
-    selectedText.textContent = '请选择标注员';
-  } else if (selectedCount === 5) {
-    selectedText.textContent = '全部标注员';
-  } else {
-    selectedText.textContent = `已选择 ${selectedCount} 个标注员`;
+  if (selectedText) {
+    if (selectedCount === 0) {
+      selectedText.textContent = '请选择切割员';
+    } else if (selectedCount === 5) {
+      selectedText.textContent = '全部切割员';
+    } else {
+      selectedText.textContent = `已选择 ${selectedCount} 个切割员`;
+    }
   }
 }
 
-// 获取选中的标注员
+// 获取选中的切割员
 function getSelectedAnnotators() {
   const annotators = [];
   
-  // 获取选中的标注组
-  document.querySelectorAll('.group-checkbox:checked').forEach(checkbox => {
-    annotators.push({
-      type: 'group',
-      id: checkbox.value,
-      name: checkbox.dataset.name,
-      count: checkbox.dataset.count ? parseInt(checkbox.dataset.count) : 1
-    });
-  });
-  
-  // 获取选中的标注员
-  document.querySelectorAll('.user-checkbox:checked').forEach(checkbox => {
+  // 获取选中的切割员
+  document.querySelectorAll('.user-item i.selected').forEach(icon => {
+    const item = icon.closest('.user-item');
+    const displayName = item.querySelector('span').textContent || item.dataset.userName;
     annotators.push({
       type: 'user',
-      id: checkbox.value,
-      name: checkbox.dataset.name,
+      id: item.dataset.userId,
+      name: displayName,
       count: 1
     });
   });
